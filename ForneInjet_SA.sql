@@ -17,13 +17,14 @@ create table Produto(
 	idMaquinas int not null auto_increment,
     tipo text,
     marca text,
-    Capacidade_de_Injeção text,
-    Força_de_Fechamento text,
-    Tipo_de_Controle text,
-    Preço_Médio_USD text,
-    Preço_Médio_BRL text,
+    modelo text,
+    capacidade_de_injeçao text,
+    força_de_fechamento text,
+    tipo_de_controle text,
+    preço_medio_USD text,
+    preço_medio_BRL text,
     fornecedor text,
-    observacoes text,
+    observacao text,
     primary key (idMaquinas)    
 );
 
