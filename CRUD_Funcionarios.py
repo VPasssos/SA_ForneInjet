@@ -49,7 +49,7 @@ class Database:
             database = "ForneInjet_SA"
         )
         self.cursor = self.conn.cursor() # Cria um cursor para executar comandos SQL
-        # Tabela "usuario" se ela naõ existir
+        # Tabela "funcionario" se ela naõ existir
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS funcionario(
                             idfuncionario INT AUTO_INCREMENT PRIMARY KEY,
                             nome_funcionario TEXT(255),
@@ -59,8 +59,8 @@ class Database:
                             departamento TEXT(255),
                             data_admissao TEXT(255),
                             situacao TEXT(255),
-                            permicao TEXT(255);
-                            ''')
+                            permicao TEXT(255)
+                            );''')
                            
         self.conn.commit() # Confirma criação da tabela
 
