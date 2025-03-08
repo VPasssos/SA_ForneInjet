@@ -1,7 +1,7 @@
 import mysql.connector
 
 from Config import get_connection
-def create_user(nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
+def create_funcioario(nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
     conn = get_connection()
     cursor = conn.cursor()
     query = "insert funcionario(nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao)VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -10,7 +10,7 @@ def create_user(nome_funcionario,telefone,email,cargo,departamento,data_addmissa
     cursor.close()
     conn.close()
 
-def read_users():  
+def read_funcionario():  
     conn = get_connection()
     cursor = conn.cursor()
     query = "SELECT * FROM funcionario"
@@ -20,7 +20,7 @@ def read_users():
     conn.close()
     return result 
 
-def update_user(idfuncionario,nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
+def update_funcionario(idfuncionario,nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
     conn = get_connection()
     cursor = conn.cursor()
     query = "UPDATE funcionario SET nome_funcionario=%s,telefone=%s,email=%s,cargo=%s,departamento=%s,data_admissao=%s,situacao=%s,permicao=%s WHERE idfuncionario= %s"
@@ -30,7 +30,7 @@ def update_user(idfuncionario,nome_funcionario,telefone,email,cargo,departamento
     conn.close()
 
     
-def delete_user(idfuncionario,nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
+def delete_funcionario(idfuncionario,nome_funcionario,telefone,email,cargo,departamento,data_addmissao,situacao,permicao):
     conn = get_connection()
     cursor = conn.cursor()
     query = "DELETE FROM funcionario WHERE idfuncionario = %s"
