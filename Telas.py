@@ -5,6 +5,12 @@ from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
 from CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
 from Tela_ADM import Login_ADM
 
+def __init__(self,root):
+        self.root = root
+        self.root.title("CRUD USUARIOS")
+        #Criaçao de WIDGETS
+        self.create_widgets()
+
 # CRIAR A JANELA
 jan = Tk()  # Criar uma instância da janela principal
 jan.title("VP Sytens - Painel de Acesso")  # Define o título da janela
@@ -74,4 +80,3 @@ LoginButton = ttk.Button(RightFrame, text="LOGIN", width=15, command=Login) # Cr
 LoginButton.place(x=80, y=225) # Posiciona o botao de login
 
 jan.mainloop()
-
