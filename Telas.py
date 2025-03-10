@@ -1,16 +1,15 @@
 # IMPORTAR AS BIBLIOTECAS
+import tkinter as tk
 from tkinter import * # Importa todos os módulos do tkinter
 from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkinter
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
 from CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
-from Tela_ADM import Login_ADM
+from Tela_ADM import TelaAbas
 
 def __init__(self,root):
         self.root = root
         self.root.title("CRUD USUARIOS")
-        #Criaçao de WIDGETS
-        self.create_widgets()
-
+        
 # CRIAR A JANELA
 jan = Tk()  # Criar uma instância da janela principal
 jan.title("VP Sytens - Painel de Acesso")  # Define o título da janela
@@ -62,15 +61,28 @@ def Login():
 
     # Verificar se o usuario foi encontrado
     if VerifyLogin:
-        messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem Vindo!") # Exibe mensagem de sucesso
+        is_admin = VerifyLogin[7]  # Supondo que o índice 3 seja a coluna 'is_admin' na sua tabela
+        
+        if is_admin == "1":  # Se o usuário for administrador
+            messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
+            UsuarioLabel.place(x=5000)  
+            UsuarioEntry.place(x=5000)  
+            SenhaLabel.place(x=5000) 
+            SenhaEntry.place(x=5000) 
+            LogoLabel.place(x=5000)
+            LoginButton.place(x=5000)
+            # Chama a função para tela de administrador
+            if __name__ == "__main__":
+                root = tk.Tk()
+                app = TelaAbas(root)
+                root.mainloop()
+
+        else:
+            messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Usuário!")
+            # Chama a tela de usuário comum, se necessário
         # REMOVENDO WIDGETS DE LOGIN
-        UsuarioLabel.place(x=5000)  
-        UsuarioEntry.place(x=5000)  
-        SenhaLabel.place(x=5000) 
-        SenhaEntry.place(x=5000) 
-        LogoLabel.place(x=5000)
-        LoginButton.place(x=5000)
-        Login_ADM()
+
+        
         
     else:
         messagebox.showinfo(title="INFO LOGIN", message="Acesso Negado. Verifique se está cadastrado no Sistema!") # Exibe mensagem de erro

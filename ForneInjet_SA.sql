@@ -4,12 +4,13 @@ create table Funcionario(
 	idFuncionario int not null auto_increment,
     nome_funcionario text,
     cargo text,
-    departamento text,
     telefone text,
     email text,
     data_admissao text,
     situacao text,
-    permicao text,
+    permissao text,
+    usuario text,
+    senha text,
     primary key (idFuncionario)    
 );
 

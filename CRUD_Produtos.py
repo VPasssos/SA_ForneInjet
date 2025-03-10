@@ -26,7 +26,7 @@ def update_produto(tipo, marca, modelo, capacidade_de_injeçao, força_de_fecham
 
     conn = get_connection()
     cursor = conn.cursor()
-    query = "UPDATE produto SET tipo = %s, marca = %s, modelo = %s, capacidade_de_injecao = %s , força_de_fechamento = %s, tipo_de_controle = %s, observaçoes = %s WHERE produtoID = %s"
+    query = "UPDATE produto SET tipo = %s, marca = %s, modelo = %s, capacidade_de_injecao = %s , força_de_fechamento = %s, tipo_de_controle = %s, observaçoes = %s WHERE idMaquinas = %s"
     cursor.execute(query, (tipo, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD,preço_medio_BRL, fornecedor, observacao, idMaquinas))
     conn.commit()
     cursor.close()
@@ -36,7 +36,7 @@ def delete_produto(idMaquinas):
 
     conn = get_connection()
     cursor = conn.cursor()
-    query = "DELETE FROM produto WHERE produtoID = %s"
+    query = "DELETE FROM produto WHERE idMaquinas = %s"
     cursor.execute(query, (idMaquinas,))
     conn.commit()
     cursor.close()
