@@ -37,7 +37,7 @@ class LoginScreen:
 
         # Aqui você pode validar o login com um banco de dados ou uma lista de usuários.
         # Por enquanto, vamos usar uma validação simples:
-        if usuario == "admin" and senha == "12345":
+        if usuario == "1" and senha == "1":
             # Login bem-sucedido, chama a tela com as abas
             self.root.withdraw()  # Oculta a tela de login
             self.show_main_screen()  # Chama a função para mostrar as abas

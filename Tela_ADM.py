@@ -4,10 +4,11 @@ from CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornece
 from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
 from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
 
-
-
 class TelaAbas:
     def Tela_ADM(self,root):
+        self.root = root
+        self.root.title("Tela Principal - Abas")
+        
         # Criar um Notebook (abas) para alternar entre Funcionario, Produto e Fornecedor
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True)
