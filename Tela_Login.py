@@ -65,28 +65,24 @@ class tela_Login:
             
             if is_admin == "1":  # Se o usuário for administrador
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
-                self.UsuarioLabel.place(x=5000)  
-                self.UsuarioEntry.place(x=5000)  
-                self.SenhaLabel.place(x=5000) 
-                self.SenhaEntry.place(x=5000) 
-                self.LogoLabel.place(x=5000)
-                self.LoginButton.place(x=5000)
                 # Chama a função para tela de administrador
                 self.root.withdraw()  # Oculta a tela de login
-                self.show_main_screen()  # Chama a função para mostrar as abas
+                self.ADM_Tela()  # Chama a função para mostrar as abas
 
             else:
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Usuário!")
-                # Chama a tela de usuário comum, se necessário
-            # REMOVENDO WIDGETS DE LOGIN
-
-            
-            
+                self.root.withdraw()  # Oculta a tela de login
+                self.ADM_NOM()  # Chama a função para mostrar as abas    
         else:
             messagebox.showinfo(title="INFO LOGIN", message="Acesso Negado. Verifique se está cadastrado no Sistema!") # Exibe mensagem de erro
 
 
-    def show_main_screen(self):
+    def ADM_Tela(self):
+        main_window = tk.Toplevel()  # Cria uma nova janela
+        main_window.geometry("600x400")  # Define o tamanho da nova janela
+        app = TelaAbas(main_window)  # Cria a instância da tela com as abas
+        main_window.mainloop()
+    def ADM_NOM(self):
         main_window = tk.Toplevel()  # Cria uma nova janela
         main_window.geometry("600x400")  # Define o tamanho da nova janela
         app = TelaAbas(main_window)  # Cria a instância da tela com as abas
