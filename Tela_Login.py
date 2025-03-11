@@ -63,7 +63,7 @@ class tela_Login:
         if VerifyLogin:
             is_admin = VerifyLogin[7]  # Supondo que o índice 3 seja a coluna 'is_admin' na sua tabela
             
-            if is_admin != "1":  # Se o usuário for administrador
+            if is_admin == "1":  # Se o usuário for administrador
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
                 self.UsuarioLabel.place(x=5000)  
                 self.UsuarioEntry.place(x=5000)  

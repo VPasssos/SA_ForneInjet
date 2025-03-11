@@ -5,7 +5,7 @@ from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funci
 from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
 
 class TelaAbas:
-    def Tela_ADM(self,root):
+    def __init__(self,root):
         self.root = root
         self.root.title("Tela Principal - Abas")
         
@@ -136,12 +136,13 @@ class TelaAbas:
     def clear_funcionario_entries(self):
         self.func_nome_funcionario_entry.delete(0, tk.END)
         self.func_cargo_entry.delete(0, tk.END)
-        self.func_departamento_entry.delete(0, tk.END)
         self.func_telefone_entry.delete(0, tk.END)
         self.func_email_entry.delete(0, tk.END)
         self.func_data_admissao_entry.delete(0, tk.END)
         self.func_situacao_entry.delete(0, tk.END)
         self.func_permissao_entry.delete(0, tk.END)
+        self.func_usuario_entry.delete(0, tk.END)
+        self.func_senha_entry.delete(0, tk.END)
 
     # Métodos para a aba Produto
     def create_produto_widgets(self):
