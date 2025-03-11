@@ -38,9 +38,9 @@ class TelaAbas:
     def create_funcionario_widgets(self):
         # Labels
         tk.Label(self.funcionario_frame, text="Nome: ").grid(row=0, column=0)
-        tk.Label(self.funcionario_frame, text="Cargo: ").grid(row=1, column=0)
+        tk.Label(self.funcionario_frame, text="Email: ").grid(row=1, column=0)
         tk.Label(self.funcionario_frame, text="Telefone: ").grid(row=2, column=0)
-        tk.Label(self.funcionario_frame, text="Email: ").grid(row=3, column=0)
+        tk.Label(self.funcionario_frame, text="Cargo: ").grid(row=3, column=0)
         tk.Label(self.funcionario_frame, text="Data Admissão: ").grid(row=4, column=0)
         tk.Label(self.funcionario_frame, text="Situação: ").grid(row=5, column=0)
         tk.Label(self.funcionario_frame, text="Permissão: ").grid(row=6, column=0)
@@ -50,9 +50,9 @@ class TelaAbas:
 
         # Entradas
         self.func_nome_funcionario_entry = tk.Entry(self.funcionario_frame)
-        self.func_cargo_entry = tk.Entry(self.funcionario_frame)
-        self.func_telefone_entry = tk.Entry(self.funcionario_frame)
         self.func_email_entry = tk.Entry(self.funcionario_frame)
+        self.func_telefone_entry = tk.Entry(self.funcionario_frame)
+        self.func_cargo_entry = tk.Entry(self.funcionario_frame)
         self.func_data_admissao_entry = tk.Entry(self.funcionario_frame)
         self.func_situacao_entry = tk.Entry(self.funcionario_frame)
         self.func_permissao_entry = tk.Entry(self.funcionario_frame)
@@ -62,9 +62,9 @@ class TelaAbas:
 
         # Posicionamento
         self.func_nome_funcionario_entry.grid(row=0, column=1)
-        self.func_cargo_entry.grid(row=1, column=1)
+        self.func_email_entry.grid(row=1, column=1)
         self.func_telefone_entry.grid(row=2, column=1)
-        self.func_email_entry.grid(row=3, column=1)
+        self.func_cargo_entry.grid(row=3, column=1)
         self.func_data_admissao_entry.grid(row=4, column=1)
         self.func_situacao_entry.grid(row=5, column=1)
         self.func_permissao_entry.grid(row=6, column=1)
@@ -103,22 +103,22 @@ class TelaAbas:
         funcionarios = read_funcionario()
         self.func_text_area.delete(1.0, tk.END)
         for funcionario in funcionarios:
-            self.func_text_area.insert(tk.END, f"ID: {funcionario[0]}, Nome: {funcionario[1]}, Cargo: {funcionario[2]}\n")
+            self.func_text_area.insert(tk.END, f"ID: {funcionario[0]}, Nome: {funcionario[1]}, Email: {funcionario[2]},telefone{funcionario[3]},Cargo:{funcionario[4]},\n")
 
     def update_funcionario(self):
         func_id = self.func_id_entry.get()
         nome = self.func_nome_funcionario_entry.get()
-        cargo = self.func_cargo_entry.get()
-        telefone = self.func_telefone_entry.get()
         email = self.func_email_entry.get()
+        telefone = self.func_telefone_entry.get()
+        cargo = self.func_cargo_entry.get()
         data_admissao = self.func_data_admissao_entry.get()
         situacao = self.func_situacao_entry.get()
         permissao = self.func_permissao_entry.get()
         usuario = self.func_usuario_entry.get()
         senha = self.func_senha_entry.get()
 
-        if func_id and nome and cargo and telefone and email and data_admissao and situacao and permissao and usuario and senha:
-            update_funcionario(func_id, nome, cargo, telefone, email, data_admissao, situacao, permissao, usuario, senha)
+        if func_id and nome and email and telefone and cargo and data_admissao and situacao and permissao and usuario and senha:
+            update_funcionario(func_id, nome, email, telefone, cargo, data_admissao, situacao, permissao, usuario, senha)
             messagebox.showinfo("Sucesso", "Funcionário atualizado com sucesso!")
             self.clear_funcionario_entries()
         else:
@@ -135,9 +135,9 @@ class TelaAbas:
 
     def clear_funcionario_entries(self):
         self.func_nome_funcionario_entry.delete(0, tk.END)
-        self.func_cargo_entry.delete(0, tk.END)
-        self.func_telefone_entry.delete(0, tk.END)
         self.func_email_entry.delete(0, tk.END)
+        self.func_telefone_entry.delete(0, tk.END)
+        self.func_cargo_entry.delete(0, tk.END)
         self.func_data_admissao_entry.delete(0, tk.END)
         self.func_situacao_entry.delete(0, tk.END)
         self.func_permissao_entry.delete(0, tk.END)

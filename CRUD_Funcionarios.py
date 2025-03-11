@@ -25,7 +25,7 @@ def update_funcionario(idfuncionario, nome_funcionario, telefone, email, cargo, 
     conn = get_connection()
     cursor = conn.cursor()
     query = """UPDATE funcionario
-               SET nome_funcionario=%s, telefone=%s, email=%s, cargo=%s, departamento=%s, data_admissao=%s, situacao=%s, permissao=%s
+               SET nome_funcionario=%s, telefone=%s, email=%s, cargo=%s, data_admissao=%s, situacao=%s, permissao=%s,usuario=%s,senha=%s
                WHERE idfuncionario=%s"""
     cursor.execute(query, (nome_funcionario, telefone, email, cargo, data_admissao, situacao, permissao, usuario, senha, idfuncionario))
     conn.commit()
@@ -59,14 +59,15 @@ class Database:
                                 email TEXT,
                                 telefone TEXT,
                                 cargo TEXT,
-                                departamento TEXT,
-                                data_admissao TEXT,  # Ou altere para DATE, se necessário
+                                data_admissao DATE,  # Ou altere para DATE, se necessário
                                 situacao TEXT,
-                                permissao TEXT
+                                permissao TEXT,
+                                usuario TEXT,
+                                senha TEXT
                             );''')
         self.conn.commit()  # Confirma criação da tabela
         print("Conectado ao banco de dados")
 
     # Método chamado quando a instância da classe é destruída
-    def __del__(self):
+    def close_connection(self):
         self.conn.close()  # Fecha a conexão com o banco de dados
