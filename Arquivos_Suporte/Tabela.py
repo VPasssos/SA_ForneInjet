@@ -34,45 +34,46 @@ def add_record():
     # Atualiza a tabela
     create_table()
 
-# Função para editar um registro
+# Função para editar um registro (preenche os campos e habilita edição)
 def edit_record(event):
     # Obtém o item selecionado na tabela
     selected_item = tree.selection()[0]
     item_values = tree.item(selected_item, 'values')
 
-    # Cria uma janela de edição
-    edit_window = tk.Toplevel(root)
-    edit_window.title("Editar Registro")
+    # Preenche os campos com os dados da linha selecionada
+    entry_nome.delete(0, tk.END)
+    entry_nome.insert(0, item_values[1])
 
-    # Campos de edição
-    tk.Label(edit_window, text="Nome:").grid(row=0, column=0, padx=5, pady=5)
-    edit_nome = tk.Entry(edit_window)
-    edit_nome.grid(row=0, column=1, padx=5, pady=5)
-    edit_nome.insert(0, item_values[1])
+    entry_idade.delete(0, tk.END)
+    entry_idade.insert(0, item_values[2])
 
-    tk.Label(edit_window, text="Idade:").grid(row=1, column=0, padx=5, pady=5)
-    edit_idade = tk.Entry(edit_window)
-    edit_idade.grid(row=1, column=1, padx=5, pady=5)
-    edit_idade.insert(0, item_values[2])
+    # Habilita o botão de salvar, pois estamos editando um registro
+    btn_save.config(state=tk.NORMAL)
 
-    # Função para salvar as alterações
-    def save_changes():
-        # Atualiza os dados na lista
-        for item in dados:
-            if item["id"] == int(item_values[0]):
-                item["nome"] = edit_nome.get()
-                item["idade"] = int(edit_idade.get())
-                break
+    # Armazena o id do registro que está sendo editado
+    global edit_id
+    edit_id = int(item_values[0])
 
-        # Atualiza a tabela
-        create_table()
+# Função para salvar as alterações de um registro editado
+def save_changes():
+    global edit_id
 
-        # Fecha a janela de edição
-        edit_window.destroy()
+    # Atualiza os dados na lista
+    for item in dados:
+        if item["id"] == edit_id:
+            item["nome"] = entry_nome.get()
+            item["idade"] = int(entry_idade.get())
+            break
 
-    # Botão para salvar as alterações
-    btn_save = tk.Button(edit_window, text="Salvar", command=save_changes)
-    btn_save.grid(row=2, column=0, columnspan=2, pady=10)
+    # Limpa os campos de entrada
+    entry_nome.delete(0, tk.END)
+    entry_idade.delete(0, tk.END)
+
+    # Desabilita o botão de salvar
+    btn_save.config(state=tk.DISABLED)
+
+    # Atualiza a tabela
+    create_table()
 
 # Cria a janela principal
 root = tk.Tk()
@@ -95,8 +96,8 @@ tree.column('idade', width=100)
 # Posiciona a tabela na janela
 tree.pack(padx=10, pady=10)
 
-# Adiciona um evento de duplo clique para editar um registro
-tree.bind("<Double-1>", edit_record)
+# Adiciona um evento de clique para editar um registro
+tree.bind("<ButtonRelease-1>", edit_record)
 
 # Campos de entrada para adicionar novos registros
 frame_input = tk.Frame(root)
@@ -112,6 +113,10 @@ entry_idade.grid(row=0, column=3, padx=5)
 
 btn_add = tk.Button(frame_input, text='Adicionar', command=add_record)
 btn_add.grid(row=0, column=4, padx=5)
+
+# Botão para salvar alterações (inicialmente desabilitado)
+btn_save = tk.Button(root, text="Salvar Alterações", state=tk.DISABLED, command=save_changes)
+btn_save.pack(pady=10)
 
 # Carrega os dados inicialmente
 create_table()
