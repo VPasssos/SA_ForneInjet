@@ -80,11 +80,16 @@ class tela_Login:
 
     def ADM_Tela(self):
         main_window = tk.Toplevel()  # Cria uma nova janela
-        main_window.geometry("600x400")  # Define o tamanho da nova janela
+        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
         app = TelaAbas_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
+
     def ADM_NOM(self):
         main_window = tk.Toplevel()  # Cria uma nova janela
-        main_window.geometry("600x400")  # Define o tamanho da nova janela
+        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
         app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
