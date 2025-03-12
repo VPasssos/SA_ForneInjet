@@ -4,7 +4,8 @@ from tkinter import * # Importa todos os módulos do tkinter
 from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkinter
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
 from CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
-from Tela_ADM import TelaAbas
+from Tela_ADM import TelaAbas_ADM
+from Tela_Nom import TelaAbas_NORM
 
 class tela_Login:
     def __init__(self,root):
@@ -16,7 +17,7 @@ class tela_Login:
         self.create_widgets()
     def create_widgets(self):
         # IMAGEM
-        self.logo = PhotoImage(file="icons/LogoVinicius.png")  # Carrega a imagem da logo
+        self.logo = PhotoImage(file="icons/LogoForneInjet.png")  # Carrega a imagem da logo
 
         # FRAMES
         self.LeftFrame = Frame(self.root, width=200, height=300, bg="white", relief="raise")  # Cria um frame à esquerda com fundo branco
@@ -27,7 +28,7 @@ class tela_Login:
 
         # LOGO
         self.LogoLabel = Label(self.LeftFrame,image=self.logo, bg="white")  # Cria uma label que carrega a logo
-        self.LogoLabel.place(x=50, y=100)  # Posiciona o label no frame esquerdo
+        self.LogoLabel.place(x=25, y=85)  # Posiciona o label no frame esquerdo
 
         # ADICIONAR CAMPOS DE USUARIO E SENHA
         self.UsuarioLabel = Label(self.RightFrame, text="Usuario:", font=("Century Gothic", 20), bg="white", fg="black")  # Cria um label para o usuario
@@ -80,10 +81,10 @@ class tela_Login:
     def ADM_Tela(self):
         main_window = tk.Toplevel()  # Cria uma nova janela
         main_window.geometry("600x400")  # Define o tamanho da nova janela
-        app = TelaAbas(main_window)  # Cria a instância da tela com as abas
+        app = TelaAbas_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
     def ADM_NOM(self):
         main_window = tk.Toplevel()  # Cria uma nova janela
         main_window.geometry("600x400")  # Define o tamanho da nova janela
-        app = TelaAbas(main_window)  # Cria a instância da tela com as abas
+        app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()

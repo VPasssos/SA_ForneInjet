@@ -4,7 +4,7 @@ from CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornece
 from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
 from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
 
-class TelaAbas:
+class TelaAbas_ADM:
     def __init__(self,root):
         self.root = root
         self.root.title("Tela Principal - Abas")
