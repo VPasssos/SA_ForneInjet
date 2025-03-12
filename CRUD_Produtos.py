@@ -5,7 +5,7 @@ fornecedor, observacao):
 
     conn = get_connection()
     cursor = conn.cursor()
-    query = "insert produto(tipo, marca, modelo, capacidade_de_injecao,força_de_fechamento, tipo_de_controle, preço_medio_USD,preço_medio_BRL, fornecedor, observacao) VALUES( %s, %s, %s, %s, %s, %s ,%s, %s, %s,%s)"
+    query = "INCERT INTO  produto(tipo, marca, modelo, capacidade_de_injecao,força_de_fechamento, tipo_de_controle, preço_medio_USD,preço_medio_BRL, fornecedor, observacao) VALUES( %s, %s, %s, %s, %s, %s ,%s, %s, %s,%s)"
     cursor.execute(query, (tipo, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD,preço_medio_BRL, fornecedor, observacao))
     conn.commit()
     cursor.close()

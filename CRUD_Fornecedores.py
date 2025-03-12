@@ -3,7 +3,7 @@ from Config import get_connection
 def create_fornecedor(nome_fornecedor, cnpj, email, endereco, telefone , contato_principal, website):
     conn = get_connection()
     cursor = conn.cursor()
-    query = "insert Fornecedor (nome_fornecedor, cnpj, email, endereco, telefone, contato_principal, website) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+    query = "INCERT INTO Fornecedor (nome_fornecedor, cnpj, email, endereco, telefone, contato_principal, website) VALUES(%s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(query,(nome_fornecedor, cnpj, email, endereco, telefone, contato_principal, website))
     conn.commit()
     cursor.close()
