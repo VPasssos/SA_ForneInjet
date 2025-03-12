@@ -23,16 +23,6 @@ class TelaAbas_ADM:
         self.notebook.add(self.funcionario_frame, text="Funcionario")
         self.create_funcionario_widgets()
 
-        # Aba Produto
-        self.produto_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.produto_frame, text="Produto")
-        self.create_produto_widgets()
-
-        # Aba Fornecedor
-        self.fornecedor_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.fornecedor_frame, text="Fornecedor")
-        self.create_fornecedor_widgets()
-
     # Métodos para a aba Funcionario
     def create_inicio_widgets(self):
         print("Teste")
