@@ -179,4 +179,3 @@ class TelaAbas_ADM:
         self.func_permissao_entry.delete(0, tk.END)
         self.func_usuario_entry.delete(0, tk.END)
         self.func_senha_entry.delete(0, tk.END)
-
