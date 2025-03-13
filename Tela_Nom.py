@@ -320,3 +320,6 @@ class TelaAbas_NORM:
         self.fornecedor_telefone_entry.delete(0, tk.END)
         self.fornecedor_email_entry.delete(0, tk.END)
         self.fornecedor_endereco_entry.delete(0, tk.END)
+
+
+        

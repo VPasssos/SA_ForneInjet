@@ -333,3 +333,84 @@ class TelaAbas_ADM:
         self.prod_fornecedor_entry.insert(0, values[9])  # Senha
         self.prod_id_entry.delete(0, tk.END)
         self.prod_id_entry.insert(0, values[0])  # ID
+
+    def create_fornecedores_widgets(self):
+      
+
+         # Labels
+        tk.Label(self.fornecedores_frame, text="Nome do fornecedor: ").grid(row=0, column=0)
+        tk.Label(self.fornecedores_frame, text="Cnpj: ").grid(row=1, column=0)
+        tk.Label(self.fornecedores_frame, text="Email: ").grid(row=2, column=0)
+        tk.Label(self.fornecedores_frame, text="Endereço: ").grid(row=3, column=0)
+        tk.Label(self.fornecedores_frame, text="Telefone: ").grid(row=4, column=0)
+        tk.Label(self.fornecedores_frame, text="Contato Principal: ").grid(row=5, column=0)
+        tk.Label(self.fornecedores_frame, text="Website: ").grid(row=6, column=0)
+
+        tk.Label(self.fornecedores_frame, text="ID (para atualizar/excluir): ").grid(row=7, column=0)
+
+       
+        # Entradas
+        self.forn_nome_fornecedor_entry = tk.Entry(self.produtos_frame)
+        self.forn_cnpj_entry = tk.Entry(self.produtos_frame)
+        self.forn_modelo_entry = tk.Entry(self.produtos_frame)
+        self.forn_email_entry = tk.Entry(self.produtos_frame)
+        self.forn_endereco_entry = tk.Entry(self.produtos_frame)
+        self.forn_telefone_entry = tk.Entry(self.produtos_frame)
+        self.forn_contato_principal_entry = tk.Entry(self.produtos_frame)
+        self.forn_website_entry = tk.Entry(self.produtos_frame)
+        
+        self.forn_id_entry = tk.Entry(self.produtos_frame)
+
+        # Posicionamento
+        self.forn_nome_fornecedor_entry.grid(row=0, column=1)
+        self.forn_cnpj_entry.grid(row=1, column=1)
+        self.forn_modelo_entry.grid(row=2, column=1)
+        self.forn_email_entry.grid(row=3, column=1)
+        self.forn_endereco_entry.grid(row=4, column=1)
+        self.forn_telefone_entry .grid(row=5, column=1)
+        self.forn_contato_principal_entry.grid(row=6, column=1)
+        self.forn_website_entry.grid(row=7, column=1)
+       
+        self.forn_id_entry.grid(row=10, column=1)
+
+        # Botões
+        tk.Button(self.fornecedores_frame, text="Criar Funcionario", command=self.create_produtos).grid(row=11, column=0)
+        tk.Button(self.fornecedores_frame, text="Listar Funcionario", command=self.read_produtos).grid(row=11, column=1)
+        tk.Button(self.fornecedores_frame, text="Atualizar Funcionario", command=self.update_produtos).grid(row=12, column=0)
+        tk.Button(self.fornecedores_frame, text="Excluir Funcionario", command=self.delete_produtos).grid(row=12, column=1)
+
+        # Tabela para exibir dados
+        self.forn_table = ttk.Treeview(self.produtos_frame, columns=("nome_fornecedor", "cnpj", "email", "endereco", "telefone", "contato_principal", "website"), show="headings")
+        self.forn_table.grid(row=13, column=0, columnspan=2)
+        
+        # Definindo as colunas
+        for col in self.forn_table["columns"]:
+            self.forn_table.heading(col, text=col)
+        
+        # Adicionar uma barra de rolagem
+        self.scrollbar = ttk.Scrollbar(self.fornecedores_frame, orient="vertical", command=self.forn_table.yview)
+        self.scrollbar.grid(row=12, column=2, sticky="ns")
+        self.forn_table.configure(yscrollcommand=self.scrollbar.set)
+
+        # Vincular o evento de clique na linha
+        self.forn_table.bind("<ButtonRelease-1>", self.row_selected_fornecedores)
+
+
+    def create_fornecedores(self):
+        nome_fornecedor = self.forn_nome_fornecedor_entry.get()
+        cnpj = self.forn_cnpj_entry.get()
+        email = self.forn_email_entry.get()
+        endereco = self.forn_endereco_entry.get()
+        telefone = self.forn_telefone_entry.get()
+        contato_principal = self.forn_contato_principal_entry.get()
+        website= self.forn_website_entry.get()
+       
+
+        if nome_fornecedor and  cnpj  and email and endereco and telefone and contato_principal  and website:
+            create_produto(nome_fornecedor, cnpj, email,endereco, telefone, contato_principal , website)
+            messagebox.showinfo("Sucesso", "fornecedor criado com sucesso!")
+            self.clear_fornecedor_entries()
+            self.read_fronecedor()  # Atualizar a tabela
+        else:
+            messagebox.showerror("Erro", "Todos os campos são obrigatórios")
+    
