@@ -23,6 +23,17 @@ class TelaAbas_ADM:
         self.notebook.add(self.funcionario_frame, text="Funcionario")
         self.create_funcionario_widgets()
 
+        # Aba produtos
+        self.produtos_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.produtos_frame, text="produtos")
+        self.create_produtos_widgets()
+
+        # Aba fornecedores
+        self.fornecedores_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.fornecedores_frame, text="fornecedores")
+
+
+
     # Métodos para a aba Funcionario
     def create_inicio_widgets(self):
         print("Teste")
@@ -179,3 +190,227 @@ class TelaAbas_ADM:
         self.func_permissao_entry.delete(0, tk.END)
         self.func_usuario_entry.delete(0, tk.END)
         self.func_senha_entry.delete(0, tk.END)
+
+    def create_produtos_widgets (self):
+
+
+
+         # Labels
+        tk.Label(self.produtos_frame, text="Tipo: ").grid(row=0, column=0)
+        tk.Label(self.produtos_frame, text="Marca: ").grid(row=1, column=0)
+        tk.Label(self.produtos_frame, text="Modelo: ").grid(row=2, column=0)
+        tk.Label(self.produtos_frame, text="Capacidade de injeçao: ").grid(row=3, column=0)
+        tk.Label(self.produtos_frame, text="Força de fechamento: ").grid(row=4, column=0)
+        tk.Label(self.produtos_frame, text="Tipo de controle: ").grid(row=5, column=0)
+        tk.Label(self.produtos_frame, text="Preço medio em USD: ").grid(row=6, column=0)
+        tk.Label(self.produtos_frame, text="Preço medio em BRL: ").grid(row=7, column=0)
+        tk.Label(self.produtos_frame, text="Fornecedor: ").grid(row=8, column=0)
+        tk.Label(self.produtos_frame, text="Observaçao: ").grid(row=9, column=0)
+        tk.Label(self.produtos_frame, text="ID (para atualizar/excluir): ").grid(row=10, column=0)
+
+        # Entradas
+        self.prod_tipo_entry = tk.Entry(self.produtos_frame)
+        self.prod_marca_entry = tk.Entry(self.produtos_frame)
+        self.prod_modelo_entry = tk.Entry(self.produtos_frame)
+        self.prod_capacidade_de_injecao_entry = tk.Entry(self.produtos_frame)
+        self.prod_forca_de_fechamento_entry = tk.Entry(self.produtos_frame)
+        self.prod_tipo_de_controle_entry = tk.Entry(self.produtos_frame)
+        self.prod_preco_usd_entry = tk.Entry(self.produtos_frame)
+        self.prod_preco_brl_entry = tk.Entry(self.produtos_frame)
+        self.prod_fornecedor_entry = tk.Entry(self.produtos_frame)
+        self.prod_observacao_entry = tk.Entry(self.produtos_frame)
+        self.prod_id_entry = tk.Entry(self.produtos_frame)
+
+        # Posicionamento
+        self.prod_tipo_entry.grid(row=0, column=1)
+        self.prod_marca_entry.grid(row=1, column=1)
+        self.prod_modelo_entry.grid(row=2, column=1)
+        self.prod_capacidade_de_injecao_entry.grid(row=3, column=1)
+        self.prod_forca_de_fechamento_entry.grid(row=4, column=1)
+        self.prod_tipo_de_controle_entry.grid(row=5, column=1)
+        self.prod_preco_usd_entry.grid(row=6, column=1)
+        self.prod_preco_brl_entry.grid(row=7, column=1)
+        self.prod_fornecedor_entry.grid(row=8, column=1)
+        self.prod_observacao_entry.grid(row=9, column=1)
+        self.prod_id_entry.grid(row=10, column=1)
+
+        # Botões
+        tk.Button(self.produtos_frame, text="Criar Produtos", command=self.create_produtos).grid(row=11, column=0)
+        tk.Button(self.produtos_frame, text="Listar Produtos", command=self.read_produtos).grid(row=11, column=1)
+        tk.Button(self.produtos_frame, text="Atualizar Produtos", command=self.update_produtos).grid(row=12, column=0)
+        tk.Button(self.produtos_frame, text="Excluir Produtos", command=self.delete_produtos).grid(row=12, column=1)
+
+        # Tabela para exibir dados
+        self.prod_table = ttk.Treeview(self.produtos_frame, columns=("ID", "tipo", "marca", "modelo", "Capacidade de injecao", "força de fechamento", "tipo de controle", "Preço medio em UDS", "preço medio em BRL", "fornecedor","observaçao"), show="headings")
+        self.prod_table.grid(row=13, column=0, columnspan=2)
+        
+        # Definindo as colunas
+        for col in self.prod_table["columns"]:
+            self.prod_table.heading(col, text=col)
+        
+        # Adicionar uma barra de rolagem
+        self.scrollbar = ttk.Scrollbar(self.produtos_frame, orient="vertical", command=self.prod_table.yview)
+        self.scrollbar.grid(row=12, column=2, sticky="ns")
+        self.prod_table.configure(yscrollcommand=self.scrollbar.set)
+
+        # Vincular o evento de clique na linha
+        self.prod_table.bind("<ButtonRelease-1>", self.row_selected_produto)
+    
+    def create_produtos (self):
+        tipo = self.prod_tipo_entry.get()
+        marca = self.prod_marca_entry.get()
+        modelo = self.prod_modelo_entry.get()
+        capacidade_de_injecao = self.prod_capacidade_de_injecao_entry.get()
+        força_de_fechamento = self.prod_forca_de_fechamento_entry.get()
+        tipo_de_controle = self.prod_tipo_de_controle_entry.get()
+        preco_medio_USD = self.prod_preco_usd_entry.get()
+        preco_medio_BRL= self.prod_preco_brl_entry.get()
+        fornecedor = self.prod_fornecedor_entry.get()
+        observacao = self.prod_observacao_entry.get()
+
+
+        if tipo and marca and modelo and capacidade_de_injecao and força_de_fechamento and tipo_de_controle  and preco_medio_USD and preco_medio_BRL and fornecedor and observacao:
+            create_produto(tipo, marca, modelo, capacidade_de_injecao, força_de_fechamento, tipo_de_controle, preco_medio_USD, preco_medio_BRL, fornecedor, observacao)
+            messagebox.showinfo("Sucesso", "Produto criado com sucesso!")
+            self.clear_produto_entries()
+            self.read_produto()  # Atualizar a tabela
+        else:
+            messagebox.showerror("Erro", "Todos os campos são obrigatórios")
+    
+    def listar_produtos(self):
+        produtos = read_produto()
+        for row in self.prod_table.get_children():
+            self.prod_table.delete(row)  # Limpar a tabela antes de adicionar novos dados
+
+        for produto in produtos:
+            self.prod_table.insert("", "end", values=produto)  # Inserir os dados na tabela
+
+    def update_produtos(self):
+        self.prod_id = self.prod_id_entry.get()
+        self.tipo = self.prod_tipo_entry.get()
+        self.marca = self.prod_marca_entry.get()
+        self.modelo = self.prod_modelo_entry.get()
+        self.capacidade_de_injecao = self.prod_capacidade_de_injecao_entry.get()
+        self.força_de_fechamento = self.prod_forca_de_fechamento_entry.get()
+        self.tipo_de_controle = self.prod_tipo_de_controle_entry.get()
+        self.preco_medio_USD = self.prod_preco_usd_entry.get()
+        self.preco_medio_BRL = self.prod_preco_brl_entry.get()
+        self.fornecedor = self.prod_fornecedor_entry.get()
+        self.observacao = self.prod_observacao_entry.get()
+
+    def delete_produtos(self):
+        prod_id = self.prod_id_entry.get()
+        if prod_id:
+            delete_funcionario(prod_id)
+            messagebox.showinfo("Sucesso", "produto excluído com sucesso!")
+            self.prod_id_entry.delete(0, tk.END)
+            self.read_produtos()  # Atualizar a tabela
+        else:
+            messagebox.showerror("Erro", "Digite um ID válido para exclusão")
+
+    def row_selected_produto(self,event):
+        selected_item = self.prod_table.selection()[0]
+        values = self.prod_table.item(selected_item, "values")
+        
+        # Preencher os campos com os dados da linha
+        self.prod_tipo_entry.delete(0, tk.END)
+        self.prod_tipo_entry.insert(0, values[1])  # Nome
+        self.prod_marca_entry.delete(0, tk.END)
+        self.prod_marca_entry.insert(0, values[2])  # Email
+        self.prod_modelo_entry.delete(0, tk.END)
+        self.prod_modelo_entry.insert(0, values[3])  # Telefone
+        self.prod_capacidade_de_injecao_entry.delete(0, tk.END)
+        self.prod_capacidade_de_injecao_entry.insert(0, values[4])  # Cargo
+        self.prod_forca_de_fechamento_entry.delete(0, tk.END)
+        self.prod_forca_de_fechamento_entry.insert(0, values[5])  # Data Admissão
+        self.prod_tipo_de_controle_entry.delete(0, tk.END)
+        self.prod_tipo_de_controle_entry.insert(0, values[6])  # Situação
+        self.prod_preco_usd_entry.delete(0, tk.END)
+        self.prod_preco_usd_entry.insert(0, values[7])  # Permissão
+        self.prod_preco_brl_entry.delete(0, tk.END)
+        self.prod_preco_brl_entry.insert(0, values[8])  # Usuario
+        self.prod_fornecedor_entry.delete(0, tk.END)
+        self.prod_fornecedor_entry.insert(0, values[9])  # Senha
+        self.prod_id_entry.delete(0, tk.END)
+        self.prod_id_entry.insert(0, values[0])  # ID
+
+    def create_fornecedores_widgets(self):
+      
+
+         # Labels
+        tk.Label(self.fornecedores_frame, text="Nome do fornecedor: ").grid(row=0, column=0)
+        tk.Label(self.fornecedores_frame, text="Cnpj: ").grid(row=1, column=0)
+        tk.Label(self.fornecedores_frame, text="Email: ").grid(row=2, column=0)
+        tk.Label(self.fornecedores_frame, text="Endereço: ").grid(row=3, column=0)
+        tk.Label(self.fornecedores_frame, text="Telefone: ").grid(row=4, column=0)
+        tk.Label(self.fornecedores_frame, text="Contato Principal: ").grid(row=5, column=0)
+        tk.Label(self.fornecedores_frame, text="Website: ").grid(row=6, column=0)
+
+        tk.Label(self.fornecedores_frame, text="ID (para atualizar/excluir): ").grid(row=7, column=0)
+
+       
+        # Entradas
+        self.forn_nome_fornecedor_entry = tk.Entry(self.produtos_frame)
+        self.forn_cnpj_entry = tk.Entry(self.produtos_frame)
+        self.forn_modelo_entry = tk.Entry(self.produtos_frame)
+        self.forn_email_entry = tk.Entry(self.produtos_frame)
+        self.forn_endereco_entry = tk.Entry(self.produtos_frame)
+        self.forn_telefone_entry = tk.Entry(self.produtos_frame)
+        self.forn_contato_principal_entry = tk.Entry(self.produtos_frame)
+        self.forn_website_entry = tk.Entry(self.produtos_frame)
+        
+        self.forn_id_entry = tk.Entry(self.produtos_frame)
+
+        # Posicionamento
+        self.forn_nome_fornecedor_entry.grid(row=0, column=1)
+        self.forn_cnpj_entry.grid(row=1, column=1)
+        self.forn_modelo_entry.grid(row=2, column=1)
+        self.forn_email_entry.grid(row=3, column=1)
+        self.forn_endereco_entry.grid(row=4, column=1)
+        self.forn_telefone_entry .grid(row=5, column=1)
+        self.forn_contato_principal_entry.grid(row=6, column=1)
+        self.forn_website_entry.grid(row=7, column=1)
+       
+        self.forn_id_entry.grid(row=10, column=1)
+
+        # Botões
+        tk.Button(self.fornecedores_frame, text="Criar Funcionario", command=self.create_produtos).grid(row=11, column=0)
+        tk.Button(self.fornecedores_frame, text="Listar Funcionario", command=self.read_produtos).grid(row=11, column=1)
+        tk.Button(self.fornecedores_frame, text="Atualizar Funcionario", command=self.update_produtos).grid(row=12, column=0)
+        tk.Button(self.fornecedores_frame, text="Excluir Funcionario", command=self.delete_produtos).grid(row=12, column=1)
+
+        # Tabela para exibir dados
+        self.forn_table = ttk.Treeview(self.produtos_frame, columns=("nome_fornecedor", "cnpj", "email", "endereco", "telefone", "contato_principal", "website"), show="headings")
+        self.forn_table.grid(row=13, column=0, columnspan=2)
+        
+        # Definindo as colunas
+        for col in self.forn_table["columns"]:
+            self.forn_table.heading(col, text=col)
+        
+        # Adicionar uma barra de rolagem
+        self.scrollbar = ttk.Scrollbar(self.fornecedores_frame, orient="vertical", command=self.forn_table.yview)
+        self.scrollbar.grid(row=12, column=2, sticky="ns")
+        self.forn_table.configure(yscrollcommand=self.scrollbar.set)
+
+        # Vincular o evento de clique na linha
+        self.forn_table.bind("<ButtonRelease-1>", self.row_selected_fornecedores)
+
+
+    def create_fornecedores(self):
+        nome_fornecedor = self.forn_nome_fornecedor_entry.get()
+        cnpj = self.forn_cnpj_entry.get()
+        email = self.forn_email_entry.get()
+        endereco = self.forn_endereco_entry.get()
+        telefone = self.forn_telefone_entry.get()
+        contato_principal = self.forn_contato_principal_entry.get()
+        website= self.forn_website_entry.get()
+       
+
+        if nome_fornecedor and  cnpj  and email and endereco and telefone and contato_principal  and website:
+            create_produto(nome_fornecedor, cnpj, email,endereco, telefone, contato_principal , website)
+            messagebox.showinfo("Sucesso", "fornecedor criado com sucesso!")
+            self.clear_fornecedor_entries()
+            self.read_fronecedor()  # Atualizar a tabela
+        else:
+            messagebox.showerror("Erro", "Todos os campos são obrigatórios")
+    
