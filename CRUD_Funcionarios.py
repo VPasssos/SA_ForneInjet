@@ -12,14 +12,42 @@ def create_funcionario(nome_funcionario, telefone, email, cargo, data_admissao, 
     conn.close()
 
 def read_funcionario():  
+    #conn = get_connection()
+    #cursor = conn.cursor()
+    #query = "SELECT * FROM funcionario"
+    #cursor.execute(query)
+    #result = cursor.fetchall()
+    #cursor.close()
+    #conn.close()
+    #return result
+
+    # Obtém a conexão com o banco de dados
     conn = get_connection()
-    cursor = conn.cursor()
-    query = "SELECT * FROM funcionario"
-    cursor.execute(query)
-    result = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return result 
+    
+    try:
+        # Cria um cursor para executar comandos SQL
+        cursor = conn.cursor()
+        
+        # Define a consulta SQL para selecionar todos os registros da tabela 'funcionario'
+        query = "SELECT * FROM funcionario"
+        
+        # Executa a consulta SQL
+        cursor.execute(query)
+        
+        # Obtém todos os resultados da consulta
+        result = cursor.fetchall()
+        
+        return result  # Retorna os resultados da consulta
+    
+    except Exception as e:
+        # Em caso de erro, pode-se logar ou mostrar a exceção
+        print(f"Erro ao executar a consulta: {e}")
+        return None
+    
+    finally:
+        # Garante que o cursor e a conexão sejam fechados, mesmo em caso de erro
+        cursor.close()
+        conn.close() 
 
 def update_funcionario(idfuncionario, nome_funcionario, telefone, email, cargo, data_admissao, situacao, permissao, usuario, senha):
     conn = get_connection()
