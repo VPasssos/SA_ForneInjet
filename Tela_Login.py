@@ -5,7 +5,7 @@ from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkint
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
 from CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
 from Tela_ADM import TelaAbas_ADM
-from Tela_Nom import TelaAbas_NORM
+
 
 class tela_Login:
     def __init__(self,root):
@@ -86,10 +86,10 @@ class tela_Login:
         app = TelaAbas_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
 
-    def ADM_NOM(self):
-        main_window = tk.Toplevel()  # Cria uma nova janela
-        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-        app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
-        main_window.mainloop()
+    # def ADM_NOM(self):
+    #     main_window = tk.Toplevel()  # Cria uma nova janela
+    #     largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+    #     altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+    #     main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
+    #     app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
+    #     main_window.mainloop()
