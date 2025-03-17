@@ -1,8 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-from CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor
-from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
-from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
+from tkinter import ttk
+from CRUD_Funcionarios import create_funcionario, update_funcionario, delete_funcionario
 
 class TelaAbas_ADM:
     def __init__(self, root):
@@ -65,10 +63,10 @@ class TelaAbas_ADM:
         self.func_id_entry.grid(row=9, column=1)
 
         # Botões
-        tk.Button(self.funcionario_frame, text="Criar Funcionario", command=self.create_funcionario).grid(row=10, column=0)
-        tk.Button(self.funcionario_frame, text="Listar Funcionarios", command=self.read_funcionarios).grid(row=10, column=1)
-        tk.Button(self.funcionario_frame, text="Atualizar Funcionario", command=self.update_funcionario).grid(row=11, column=0)
-        tk.Button(self.funcionario_frame, text="Excluir Funcionario", command=self.delete_funcionario).grid(row=11, column=1)
+        tk.Button(self.funcionario_frame, text="Criar Funcionario", command=self.criar_funcionarios).grid(row=10, column=0)
+        tk.Button(self.funcionario_frame, text="Listar Funcionarios", command=self.listar_funcionarios).grid(row=10, column=1)
+        tk.Button(self.funcionario_frame, text="Atualizar Funcionario", command=self.atualizar_funcionario).grid(row=11, column=0)
+        tk.Button(self.funcionario_frame, text="Excluir Funcionario", command=self.deletetar_funcionario).grid(row=11, column=1)
 
         # Tabela para exibir dados
         self.func_table = ttk.Treeview(self.funcionario_frame, columns=("ID", "Nome", "Email", "Telefone", "Cargo", "Data Admissao", "Situacao", "Permissao", "Usuario", "Senha"), show="headings")
@@ -112,71 +110,11 @@ class TelaAbas_ADM:
         self.func_id_entry.delete(0, tk.END)
         self.func_id_entry.insert(0, values[0])  # ID
 
-    def create_funcionario(self):
-        nome_funcionario = self.func_nome_funcionario_entry.get()
-        cargo = self.func_cargo_entry.get()
-        telefone = self.func_telefone_entry.get()
-        email = self.func_email_entry.get()
-        data_admissao = self.func_data_admissao_entry.get()
-        situacao = self.func_situacao_entry.get()
-        permissao = self.func_permissao_entry.get()
-        usuario = self.func_usuario_entry.get()
-        senha = self.func_senha_entry.get()
-
-        if nome_funcionario and cargo and telefone and email and data_admissao and situacao and permissao and usuario and senha:
-            create_funcionario(nome_funcionario, cargo, telefone, email, data_admissao, situacao, permissao, usuario, senha)
-            messagebox.showinfo("Sucesso", "Funcionário criado com sucesso!")
-            self.clear_funcionario_entries()
-            self.read_funcionarios()  # Atualizar a tabela
-        else:
-            messagebox.showerror("Erro", "Todos os campos são obrigatórios")
-
-    def read_funcionarios(self):
-        funcionarios = read_funcionario()
-        for row in self.func_table.get_children():
-            self.func_table.delete(row)  # Limpar a tabela antes de adicionar novos dados
-
-        for funcionario in funcionarios:
-            self.func_table.insert("", "end", values=funcionario)  # Inserir os dados na tabela
-
-    def update_funcionario(self):
-        func_id = self.func_id_entry.get()
-        nome = self.func_nome_funcionario_entry.get()
-        email = self.func_email_entry.get()
-        telefone = self.func_telefone_entry.get()
-        cargo = self.func_cargo_entry.get()
-        data_admissao = self.func_data_admissao_entry.get()
-        situacao = self.func_situacao_entry.get()
-        permissao = self.func_permissao_entry.get()
-        usuario = self.func_usuario_entry.get()
-        senha = self.func_senha_entry.get()
-
-        if func_id and nome and email and telefone and cargo and data_admissao and situacao and permissao and usuario and senha:
-            update_funcionario(func_id, nome, email, telefone, cargo, data_admissao, situacao, permissao, usuario, senha)
-            messagebox.showinfo("Sucesso", "Funcionário atualizado com sucesso!")
-            self.clear_funcionario_entries()
-            self.read_funcionarios()  # Atualizar a tabela
-        else:
-            messagebox.showerror("Erro", "Todos os campos são obrigatórios")
-
-    def delete_funcionario(self):
-        func_id = self.func_id_entry.get()
-        if func_id:
-            delete_funcionario(func_id)
-            messagebox.showinfo("Sucesso", "Funcionário excluído com sucesso!")
-            self.func_id_entry.delete(0, tk.END)
-            self.read_funcionarios()  # Atualizar a tabela
-        else:
-            messagebox.showerror("Erro", "Digite um ID válido para exclusão")
-
-    def clear_funcionario_entries(self):
-        self.func_nome_funcionario_entry.delete(0, tk.END)
-        self.func_email_entry.delete(0, tk.END)
-        self.func_telefone_entry.delete(0, tk.END)
-        self.func_cargo_entry.delete(0, tk.END)
-        self.func_data_admissao_entry.delete(0, tk.END)
-        self.func_situacao_entry.delete(0, tk.END)
-        self.func_permissao_entry.delete(0, tk.END)
-        self.func_usuario_entry.delete(0, tk.END)
-        self.func_senha_entry.delete(0, tk.END)
-
+    def criar_funcionarios(self):
+        create_funcionario(self)
+    def listar_funcionarios(self):
+        read_funcionario(self)
+    def atualizar_funcionario(self):
+        update_funcionario(self)
+    def deletetar_funcionario(self):
+        delete_funcionario(self)
