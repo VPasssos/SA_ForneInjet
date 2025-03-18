@@ -64,7 +64,7 @@ class tela_Login:
         if VerifyLogin:
             is_admin = VerifyLogin[7]  # Supondo que o índice 3 seja a coluna 'is_admin' na sua tabela
             
-            if is_admin == "1":  # Se o usuário for administrador
+            if is_admin == "admin":  # Se o usuário for administrador
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
                 # Chama a função para tela de administrador
                 self.root.withdraw()  # Oculta a tela de login
@@ -86,10 +86,10 @@ class tela_Login:
         app = TelaAbas_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
 
-    # def ADM_NOM(self):
-    #     main_window = tk.Toplevel()  # Cria uma nova janela
-    #     largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-    #     altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-    #     main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-    #     app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
-    #     main_window.mainloop()
+    def ADM_NOM(self):
+        main_window = tk.Toplevel()  # Cria uma nova janela
+        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
+        app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
+        main_window.mainloop()

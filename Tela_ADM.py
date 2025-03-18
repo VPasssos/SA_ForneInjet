@@ -1,9 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-
-# from CRUD_Produtos import create_produto, update_produto, delete_produto, read_produtos
-# from CRUD_Fornecedores import create_fornecedor, update_fornecedor, delete_fornecedor, read_fornecedores
-# from CRUD_Funcionarios import create_funcionario, update_funcionario, delete_funcionario, read_funcionarios
+from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
+from CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor
+from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
 
 class TelaAbas_ADM:
     def __init__(self, root):
@@ -37,35 +36,86 @@ class TelaAbas_ADM:
 
     # Métodos para a aba inicial
     def create_inicio_widgets(self):
-        print("Tela Inicial")
+        # Adicionando o texto de boas-vindas
+        welcome_label = tk.Label(self.inicio_frame, text="Seja bem-vindo ao Forninet!", 
+                                font=("Century Gothic", 20, "bold"), fg="black")
+        welcome_label.pack(pady=20)  # Usando pack com espaçamento vertical
 
     # Métodos para a aba produto
     def create_produto_widgets(self):
-        labels_produto = ["Tipo", "Marca", "Modelo", "Capacidade de Injeção", "Força de Fechamento", "Tipo de Controle", "Preço Médio (USD)", "Preço Médio (BRL)", "Fornecedor", "Observação"]
-        self.create_crud_widgets(self.produto_frame, labels_produto, self.criar_produto, self.listar_produtos, self.atualizar_produto, self.deletetar_produto)
+        labels_produto = ["Quatidade", "Marca", "Modelo", "Capacidade de Injeção", "Força de Fechamento", 
+                        "Tipo de Controle", "Preço Médio (USD)", "Preço Médio (BRL)", "Fornecedor", "Observação"]
+        self.create_entries(self.produto_frame, labels_produto)
+        
+        # Adicionando o campo ID para produto
+        self.id_maquinas_entry = ttk.Entry(self.produto_frame, width=50)
+        self.id_maquinas_entry.grid(row=len(labels_produto), column=1, padx=10, pady=5, sticky="w")
+        tk.Label(self.produto_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_produto) + 1, column=0, padx=10, pady=5, sticky="w")
+
+        # Definindo as entradas específicas da aba produto
+        self.quantidade_entry = self.entries["Quatidade"]
+        self.marca_entry = self.entries["Marca"]
+        self.modelo_entry = self.entries["Modelo"]
+        self.capacidade_entry = self.entries["Capacidade de Injeção"]
+        self.forca_fechar_entry = self.entries["Força de Fechamento"]
+        self.tipo_controle_entry = self.entries["Tipo de Controle"]
+        self.preco_usd_entry = self.entries["Preço Médio (USD)"]
+        self.preco_brl_entry = self.entries["Preço Médio (BRL)"]
+        self.fornecedor_produto_entry = self.entries["Fornecedor"]
+        self.observacao_entry = self.entries["Observação"]
+
+        # Botões CRUD separados para Produto
+        self.create_crud_widgets_produto(self.produto_frame)
+
+        # Tabela para Produtos
+        self.create_produto_table(self.produto_frame)
+        read_produto(self)
 
     def criar_produto(self):
         create_produto(self)
+        read_fornecedor(self)
+        
 
     def listar_produtos(self):
-        read_produtos(self)
+        read_produto(self)
 
     def atualizar_produto(self):
         update_produto(self)
-
+        read_fornecedor(self)
     def deletetar_produto(self):
         delete_produto(self)
-
+        read_fornecedor(self)
     # Métodos para a aba fornecedor
     def create_fornecedor_widgets(self):
-        labels_fornecedor = ["Nome do Fornecedor", "Endereço", "Telefone", "Email", "Contato Principal", "Website"]
-        self.create_crud_widgets(self.fornecedor_frame, labels_fornecedor, self.criar_fornecedor, self.listar_fornecedores, self.atualizar_fornecedor, self.deletetar_fornecedor)
+        labels_fornecedor = ["Nome do Fornecedor", "CNPJ", "Email", "Endereço", "Telefone", "Contato Principal", "Website"]
+        self.create_entries(self.fornecedor_frame, labels_fornecedor)
+        
+        # Adicionando o campo ID para fornecedor
+        self.id_fornecedor_entry = ttk.Entry(self.fornecedor_frame, width=50)
+        self.id_fornecedor_entry.grid(row=len(labels_fornecedor), column=1, padx=10, pady=5, sticky="w")
+        tk.Label(self.fornecedor_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_fornecedor), column=0, padx=10, pady=5, sticky="w")
+        
+        # Definindo as entradas específicas da aba fornecedor
+        self.nome_fornecedor_entry = self.entries["Nome do Fornecedor"]
+        self.cnpj_entry = self.entries["CNPJ"]
+        self.email_entry = self.entries["Email"]
+        self.endereco_entry = self.entries["Endereço"]
+        self.telefone_entry = self.entries["Telefone"]
+        self.contato_principal_entry = self.entries["Contato Principal"]
+        self.website_entry = self.entries["Website"]
+
+        # Botões CRUD separados para Fornecedor
+        self.create_crud_widgets_fornecedor(self.fornecedor_frame)
+
+        # Tabela para Fornecedores
+        self.create_fornecedor_table(self.fornecedor_frame)
+        read_fornecedor(self)
 
     def criar_fornecedor(self):
         create_fornecedor(self)
 
-    def listar_fornecedores(self):
-        read_fornecedores(self)
+    def listar_fornecedor(self):
+        read_fornecedor(self)
 
     def atualizar_fornecedor(self):
         update_fornecedor(self)
@@ -73,16 +123,50 @@ class TelaAbas_ADM:
     def deletetar_fornecedor(self):
         delete_fornecedor(self)
 
+    def clear_fornecedor_entries(self):
+        self.nome_fornecedor_entry.delete(0, tk.END)
+        self.cnpj_entry.delete(0, tk.END)
+        self.email_entry.delete(0, tk.END)
+        self.endereco_entry.delete(0, tk.END)
+        self.telefone_entry.delete(0, tk.END)
+        self.contato_principal_entry.delete(0, tk.END)
+        self.website_entry.delete(0, tk.END)
+        self.id_fornecedor_entry.delete(0, tk.END)
+
     # Métodos para a aba funcionario
     def create_funcionario_widgets(self):
-        labels_funcionario = ["Nome", "Cargo", "Telefone", "Email", "Data de Admissão", "Situação", "Permissão", "Usuário", "Senha"]
-        self.create_crud_widgets(self.funcionario_frame, labels_funcionario, self.criar_funcionario, self.listar_funcionarios, self.atualizar_funcionario, self.deletetar_funcionario)
+        labels_funcionario = ["Nome", "Cargo", "Telefone", "Email", "Data de Admissão", "Situação", "Permissão", 
+                            "Usuário", "Senha"]
+        self.create_entries(self.funcionario_frame, labels_funcionario)
+        
+        # Adicionando o campo ID para funcionario
+        self.id_funcionario_entry = ttk.Entry(self.funcionario_frame, width=50)
+        self.id_funcionario_entry.grid(row=len(labels_funcionario), column=1, padx=10, pady=5, sticky="w")
+        tk.Label(self.funcionario_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_funcionario), column=0, padx=10, pady=5, sticky="w")
+        
+        # Definindo as entradas específicas da aba funcionario
+        self.nome_funcionario_entry = self.entries["Nome"]
+        self.cargo_entry = self.entries["Cargo"]
+        self.telefone_funcionario_entry = self.entries["Telefone"]
+        self.email_funcionario_entry = self.entries["Email"]
+        self.data_admissao_entry = self.entries["Data de Admissão"]
+        self.situacao_entry = self.entries["Situação"]
+        self.permissao_entry = self.entries["Permissão"]
+        self.usuario_entry = self.entries["Usuário"]
+        self.senha_entry = self.entries["Senha"]
+
+        # Botões CRUD separados para Funcionario
+        self.create_crud_widgets_funcionario(self.funcionario_frame)
+
+        # Tabela para Funcionários
+        self.create_funcionario_table(self.funcionario_frame)
+        read_funcionario(self)
 
     def criar_funcionario(self):
         create_funcionario(self)
 
     def listar_funcionarios(self):
-        read_funcionarios(self)
+        read_funcionario(self)
 
     def atualizar_funcionario(self):
         update_funcionario(self)
@@ -90,93 +174,142 @@ class TelaAbas_ADM:
     def deletetar_funcionario(self):
         delete_funcionario(self)
 
-    # Método genérico para criar os widgets CRUD em qualquer aba
-    def create_crud_widgets(self, frame, labels, criar_command, listar_command, atualizar_command, deletar_command):
-        # Entradas
+    # Método para criar os Entry widgets para uma aba específica
+    def create_entries(self, frame, labels):
+        """Cria os widgets Entry para os labels fornecidos"""
         self.entries = {}
         for i, label in enumerate(labels):
             # Criar o label
             tk.Label(frame, text=f"{label}: ", font=("Century Gothic", 15), fg="black").grid(row=i, column=0, padx=10, pady=5, sticky="w")
             # Criar a entrada (Entry)
             self.entries[label] = ttk.Entry(frame, width=50)  # Tamanho ajustado para entradas
-            self.entries[label].grid(row=i, column=1, padx=10, pady=5, sticky="w")  # Mantém a diferença de espaçamento entre os campos
+            self.entries[label].grid(row=i, column=1, padx=10, pady=5, sticky="w")
 
-        # Barra de pesquisa (filtro por nome) e botões na linha horizontal
+    # Métodos para os botões CRUD nas diferentes abas
+
+    def create_crud_widgets_produto(self, frame):
         search_frame = ttk.Frame(frame)
-        search_frame.grid(row=len(labels), column=0, columnspan=2, pady=10, sticky="w")
+        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
 
-        # Barra de pesquisa
-        tk.Label(search_frame, text="Pesquisa:", font=("Century Gothic", 15), fg="black").pack(side="left", padx=10)
-        self.search_entry = ttk.Entry(search_frame, width=50)
+        ttk.Button(search_frame, text="CRIAR PRODUTO", command=self.criar_produto, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="LISTAR PRODUTO", command=self.listar_produtos, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="ATUALIZAR PRODUTO", command=self.atualizar_produto, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="EXCLUIR PRODUTO", command=self.deletetar_produto, style='TButton').pack(side="left", padx=5, pady=5)
 
-        # Adicionar o texto de placeholder "Insira um nome"
-        self.search_entry.insert(0, "Insira um nome")
-        self.search_entry.bind("<FocusIn>", self.on_entry_click)  # Quando o campo receber foco
-        self.search_entry.bind("<FocusOut>", self.on_focusout)  # Quando o campo perder o foco
-        self.search_entry.pack(side="left", padx=10)
+    def create_crud_widgets_fornecedor(self, frame):
+        search_frame = ttk.Frame(frame)
+        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
 
-        # Criar o estilo para os botões
-        style = ttk.Style()
-        style.configure('TButton', 
-                        font=("Century Gothic", 8, "bold"),  # Font em negrito
-                        foreground="black", 
-                        padding=(2))  # Ajuste de padding, um pouco maior que o Entry
+        ttk.Button(search_frame, text="CRIAR FORNECEDOR", command=self.criar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="LISTAR FORNECEDOR", command=self.listar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="ATUALIZAR FORNECEDOR", command=self.atualizar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="EXCLUIR FORNECEDOR", command=self.deletetar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
 
-        # Botões de CRUD e Filtro (em linha horizontal, ao lado da barra de pesquisa)
-        ttk.Button(search_frame, text="FILTRAR", command=self.filtrar_tabela, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="CRIAR", command=criar_command, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="LISTAR", command=listar_command, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="ATUALIZAR", command=atualizar_command, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="EXCLUIR", command=deletar_command, style='TButton').pack(side="left", padx=5, pady=5)
+    def create_crud_widgets_funcionario(self, frame):
+        search_frame = ttk.Frame(frame)
+        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
 
-        # Tabela para exibir dados
-        self.table = ttk.Treeview(frame, columns=("ID", "Nome", "Email", "Telefone", "Cargo", "Data Admissao", "Situacao", "Permissao", "Usuario", "Senha"), show="headings")
-        self.table.grid(row=len(labels)+1, column=0, columnspan=3, padx=15, pady=15, sticky="nsew")
-        
-        # Definindo as colunas
-        for col in self.table["columns"]:
-            self.table.heading(col, text=col)
-        
-        # Ajustando a largura das colunas específicas (ID e Permissao)
-        self.table.column("ID", width=60, anchor="center")  # Diminuir a largura da coluna "ID"
-        self.table.column("Permissao", width=80, anchor="center")  # Diminuir a largura da coluna "Permissao"
+        ttk.Button(search_frame, text="CRIAR FUNCIONÁRIO", command=self.criar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="LISTAR FUNCIONÁRIO", command=self.listar_funcionarios, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="ATUALIZAR FUNCIONÁRIO", command=self.atualizar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
+        ttk.Button(search_frame, text="EXCLUIR FUNCIONÁRIO", command=self.deletetar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
 
-        # Adicionar uma barra de rolagem
-        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=self.table.yview)
-        scrollbar.grid(row=len(labels)+1, column=2, sticky="ns")
-        self.table.configure(yscrollcommand=scrollbar.set)
+    # Métodos para as tabelas de cada aba
 
-        # Configurar o comportamento de redimensionamento para preencher o espaço
-        frame.grid_rowconfigure(len(labels)+1, weight=1)
-        frame.grid_columnconfigure(1, weight=1)
+    def create_produto_table(self, frame):
+        columns = ["ID", "Quantidade", "Marca", "Modelo", "Capacidade de Injeção", "Força de Fechamento", 
+                   "Quantidade de Controle", "Preço Médio (USD)", "Preço Médio (BRL)", "Fornecedor", "Observação"]
+        self.produto_table = self.create_table(frame, columns)
 
-        # Configurar a centralização do espaço restante
-        frame.grid_columnconfigure(2, weight=1)
+    def create_fornecedor_table(self, frame):
+        columns = ["ID", "Nome", "CNPJ", "Email", "Endereço", "Telefone", "Contato Principal", "Website"]
+        self.fornecedor_table = self.create_table(frame, columns)
 
-        # Ajuste na tabela para ter a largura correta com a barra de rolagem
-        self.table.grid(row=len(labels)+1, column=0, columnspan=2, padx=15, pady=15, sticky="nsew")
-        scrollbar.grid(row=len(labels)+1, column=2, sticky="ns")
+    def create_funcionario_table(self, frame):
+        columns = ["ID", "Nome", "Cargo", "Telefone", "Email", "Data de Admissão", "Situação", "Permissão", 
+                   "Usuário", "Senha"]
+        self.funcionario_table = self.create_table(frame, columns)
 
-    # Função de filtro para a tabela
-    def filtrar_tabela(self):
-        nome_filtro = self.search_entry.get().lower()  # Obtém o nome digitado para pesquisa
-        for row in self.table.get_children():
-            values = self.table.item(row, "values")
-            nome = values[1].lower()  # Coluna "Nome" (índice 1)
-            
-            if nome_filtro in nome:
-                self.table.item(row, tags="match")  # Marcar a linha como "match"
-                self.table.selection_add(row)  # Selecionar a linha que corresponde ao filtro
-            else:
-                self.table.item(row, tags="no_match")  # Marcar a linha como "no_match"
-                self.table.selection_remove(row)  # Remover a seleção da linha que não corresponde ao filtro
+    def create_table(self, frame, columns):
+        tree = ttk.Treeview(frame, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=150, anchor="center")
+        tree.grid(row=11, column=0, columnspan=2, pady=10, sticky="w")
+        return tree
 
-    # Função para limpar o texto de placeholder quando o campo recebe foco
-    def on_entry_click(self, event):
-        if self.search_entry.get() == "Insira um nome":
-            self.search_entry.delete(0, tk.END)  # Limpa o texto de placeholder
+    def on_table_select_produto(self, event):
+        selected_item = self.produto_table.selection()
+        if selected_item:
+            item_values = self.produto_table.item(selected_item)['values']
+            # Preenche os campos de entrada com os dados da linha selecionada
+            self.quantidade_entry.delete(0, tk.END)
+            self.quantidade_entry.insert(0, item_values[1])
+            self.marca_entry.delete(0, tk.END)
+            self.marca_entry.insert(0, item_values[2])
+            self.modelo_entry.delete(0, tk.END)
+            self.modelo_entry.insert(0, item_values[3])
+            self.capacidade_entry.delete(0, tk.END)
+            self.capacidade_entry.insert(0, item_values[4])
+            self.forca_fechar_entry.delete(0, tk.END)
+            self.forca_fechar_entry.insert(0, item_values[5])
+            self.tipo_controle_entry.delete(0, tk.END)
+            self.tipo_controle_entry.insert(0, item_values[6])
+            self.preco_usd_entry.delete(0, tk.END)
+            self.preco_usd_entry.insert(0, item_values[7])
+            self.preco_brl_entry.delete(0, tk.END)
+            self.preco_brl_entry.insert(0, item_values[8])
+            self.fornecedor_produto_entry.delete(0, tk.END)
+            self.fornecedor_produto_entry.insert(0, item_values[9])
+            self.observacao_entry.delete(0, tk.END)
+            self.observacao_entry.insert(0, item_values[10])
+            self.id_maquinas_entry.delete(0, tk.END)
+            self.id_maquinas_entry.insert(0, item_values[11])
 
-    # Função para restaurar o texto de placeholder se o campo estiver vazio
-    def on_focusout(self, event):
-        if self.search_entry.get() == "":
-            self.search_entry.insert(0, "Insira um nome")  # Restaura o texto de placeholder
+    def on_table_select_fornecedor(self, event):
+        selected_item = self.fornecedor_table.selection()
+        if selected_item:
+            item_values = self.fornecedor_table.item(selected_item)['values']
+            # Preenche os campos de entrada com os dados da linha selecionada
+            self.nome_fornecedor_entry.delete(0, tk.END)
+            self.nome_fornecedor_entry.insert(0, item_values[1])
+            self.cnpj_entry.delete(0, tk.END)
+            self.cnpj_entry.insert(0, item_values[2])
+            self.email_entry.delete(0, tk.END)
+            self.email_entry.insert(0, item_values[3])
+            self.endereco_entry.delete(0, tk.END)
+            self.endereco_entry.insert(0, item_values[4])
+            self.telefone_entry.delete(0, tk.END)
+            self.telefone_entry.insert(0, item_values[5])
+            self.contato_principal_entry.delete(0, tk.END)
+            self.contato_principal_entry.insert(0, item_values[6])
+            self.website_entry.delete(0, tk.END)
+            self.website_entry.insert(0, item_values[7])
+            self.id_fornecedor_entry.delete(0, tk.END)
+            self.id_fornecedor_entry.insert(0, item_values[8])
+
+    def on_table_select_funcionario(self, event):
+        selected_item = self.funcionario_table.selection()
+        if selected_item:
+            item_values = self.funcionario_table.item(selected_item)['values']
+            # Preenche os campos de entrada com os dados da linha selecionada
+            self.nome_funcionario_entry.delete(0, tk.END)
+            self.nome_funcionario_entry.insert(0, item_values[1])
+            self.cargo_entry.delete(0, tk.END)
+            self.cargo_entry.insert(0, item_values[2])
+            self.telefone_funcionario_entry.delete(0, tk.END)
+            self.telefone_funcionario_entry.insert(0, item_values[3])
+            self.email_funcionario_entry.delete(0, tk.END)
+            self.email_funcionario_entry.insert(0, item_values[4])
+            self.data_admissao_entry.delete(0, tk.END)
+            self.data_admissao_entry.insert(0, item_values[5])
+            self.situacao_entry.delete(0, tk.END)
+            self.situacao_entry.insert(0, item_values[6])
+            self.permissao_entry.delete(0, tk.END)
+            self.permissao_entry.insert(0, item_values[7])
+            self.usuario_entry.delete(0, tk.END)
+            self.usuario_entry.insert(0, item_values[8])
+            self.senha_entry.delete(0, tk.END)
+            self.senha_entry.insert(0, item_values[9])
+            self.id_funcionario_entry.delete(0, tk.END)
+            self.id_funcionario_entry.insert(0, item_values[8])

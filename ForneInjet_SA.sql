@@ -16,7 +16,7 @@ create database ForneInjet_SA
 
     create table Produto(
         idMaquinas int not null auto_increment,
-        tipo text,
+        quantidade text,
         marca text,
         modelo text,
         capacidade_de_injeçao text,
@@ -32,6 +32,7 @@ create database ForneInjet_SA
     create table Fornecedor(
         idFornecedor int not null auto_increment,
         nome_fornecedor text,  
+        cnpj text,
         endereco text,
         telefone text,
         email text,
