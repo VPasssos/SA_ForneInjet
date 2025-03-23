@@ -70,12 +70,12 @@ def create_funcionario(self):
 
 def read_funcionario(self):
     # Chama a função de listagem de funcionários e armazena os dados retornados
-    funcionarios = listar_funcionario(self)  # Função que retorna uma lista de dados de funcionários
+    funcionarios = listar_funcionario()  # Função que retorna uma lista de dados de funcionários
     
     # Limpa a tabela de funcionários antes de adicionar novos dados
     for row in self.funcionario_table.get_children():
-        self.funcionario_table.delete(row)  # Deleta todas as linhas existentes na tabela
-    
+        self.fornecedor_table.insert("", "end", values=funcionario)  # Inserir os dados na tabela
+
     # Insere cada funcionário na tabela
     for funcionario in funcionarios:
         self.funcionario_table.insert("", "end", values=funcionario)  # Insere cada linha na tabela
