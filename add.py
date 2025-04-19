@@ -6,7 +6,8 @@ query = """
 INSERT INTO Funcionario (nome_funcionario, cargo, telefone, email, data_admissao, situacao, permissao, usuario, senha) 
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
-cursor.execute(query, (1, 1, 1, 1, 1, 1, "nom", 1, 1))
+cursor.execute(query, (1, 1, 1, 1, 1, 1, "adim", 10, 1))
 conn.commit()
 cursor.close()
 conn.close()
+print("Cadastro bem sucedido")
