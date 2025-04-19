@@ -1,5 +1,5 @@
 import tkinter as tk
-from Tela_Login import tela_Login  # Importando a classe de tela de login
+from TELAS.TELA_LOGIN import tela_Login  # Importando a classe de tela de login
 
 if __name__ == "__main__":
     root = tk.Tk()  # Janela principal

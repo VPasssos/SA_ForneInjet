@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-from CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
-from CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor
-from CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
+from CRUD.CRUD_Produtos import create_produto, read_produto, update_produto, delete_produto
+from CRUD.CRUD_Fornecedores import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor
+from CRUD.CRUD_Funcionarios import create_funcionario, read_funcionario, update_funcionario, delete_funcionario
 
 class TelaAbas_ADM:
     def __init__(self, root):

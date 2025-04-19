@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import * # Importa todos os módulos do tkinter
 from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkinter
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
-from CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
-from Tela_ADM import TelaAbas_ADM
-
+from CRUD.CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
+from TELA_ADM import TelaAbas_ADM
+from TELA_USUARIO import TelaAbas_ADM
 
 class tela_Login:
     def __init__(self,root):
