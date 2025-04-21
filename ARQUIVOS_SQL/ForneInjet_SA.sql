@@ -34,9 +34,9 @@ CREATE TABLE Fornecedor (
     idFornecedor INT NOT NULL AUTO_INCREMENT,
     nome_fornecedor VARCHAR(100),  
     cnpj VARCHAR(20),
+    email VARCHAR(100),
     endereco VARCHAR(150),
     telefone VARCHAR(20),
-    email VARCHAR(100),
     contato_principal VARCHAR(100),
     website VARCHAR(100),
     PRIMARY KEY (idFornecedor)

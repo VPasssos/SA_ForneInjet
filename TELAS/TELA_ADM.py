@@ -3,7 +3,6 @@ from tkinter import ttk
 from CRUD.CRUD_INJETORA import create_injetora, read_injetora, update_injetora, delete_injetora, clear_injetora_entries
 from CRUD.CRUD_FORNECEDOR import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor, clear_fornecedor_entries
 from CRUD.CRUD_FUNCIONARIO import create_funcionario, read_funcionario, update_funcionario, delete_funcionario, clear_funcionario_entries
-
 class TELAABAS_ADM:
     def __init__(self, root):
         self.root = root
@@ -48,10 +47,9 @@ class TELAABAS_ADM:
         self.entries_injetora = self.create_entries(self.injetora_frame, labels_injetora)
         
         # Adicionando o campo ID para injetora
-        tk.Label(self.injetora_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_injetora), column=0, padx=10, pady=5, sticky="w")
         self.id_maquinas_entry = ttk.Entry(self.injetora_frame, width=50)
         self.id_maquinas_entry.grid(row=len(labels_injetora), column=1, padx=10, pady=5, sticky="w")
-
+        self.id_maquinas_entry.grid_remove()
         # Definindo as entradas específicas da aba injetora
         self.quantidade_entry = self.entries_injetora["Quantidade"]
         self.marca_entry = self.entries_injetora["Marca"]
@@ -95,10 +93,9 @@ class TELAABAS_ADM:
         self.entries_fornecedor = self.create_entries(self.fornecedor_frame, labels_fornecedor)
         
         # Adicionando o campo ID para fornecedor
-        tk.Label(self.fornecedor_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_fornecedor), column=0, padx=10, pady=5, sticky="w")
         self.id_fornecedor_entry = ttk.Entry(self.fornecedor_frame, width=50)
         self.id_fornecedor_entry.grid(row=len(labels_fornecedor), column=1, padx=10, pady=5, sticky="w")
-        
+        self.id_fornecedor_entry.grid_remove()
         # Definindo as entradas específicas da aba fornecedor
         self.nome_fornecedor_entry = self.entries_fornecedor["Nome do Fornecedor"]
         self.cnpj_entry = self.entries_fornecedor["CNPJ"]
@@ -150,10 +147,9 @@ class TELAABAS_ADM:
         self.entries_funcionario = self.create_entries(self.funcionario_frame, labels_funcionario)
         
         # Adicionando o campo ID para funcionario
-        tk.Label(self.funcionario_frame, text="ID:", font=("Century Gothic", 15), fg="black").grid(row=len(labels_funcionario), column=0, padx=10, pady=5, sticky="w")
         self.id_funcionario_entry = ttk.Entry(self.funcionario_frame, width=50)
         self.id_funcionario_entry.grid(row=len(labels_funcionario), column=1, padx=10, pady=5, sticky="w")
-        
+        self.id_funcionario_entry.grid_remove()
         # Definindo as entradas específicas da aba funcionario
         self.nome_funcionario_entry = self.entries_funcionario["Nome"]
         self.cargo_entry = self.entries_funcionario["Cargo"]
@@ -249,7 +245,14 @@ class TELAABAS_ADM:
         tree = ttk.Treeview(frame, columns=columns, show="headings")
         for col in columns:
             tree.heading(col, text=col)
-            tree.column(col, width=150, anchor="center")
+            if col == "ID":
+                tree.column(col, width=50, anchor="center")  # Coluna ID
+            elif col == "Endereço" or col == "Observação" or col == "Email Fornecedor" or col == "Email Funcionário ":
+                tree.column(col, width=255, anchor="w")  # Colunas mais largas
+            elif col == "Quantidade" or col == "Marca" or col == "Permissão" or col == "Situação" or col == "Modelo":
+                tree.column(col, width=75, anchor="center")  # Colunas pequenas
+            else:
+                tree.column(col, width=170, anchor="center")  # Colunas médias
         tree.grid(row=11, column=0, columnspan=2, pady=10, sticky="nsew")
         
         # Adicionar scrollbar

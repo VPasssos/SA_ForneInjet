@@ -5,7 +5,7 @@ from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkint
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
 from CRUD.CRUD_FUNCIONARIO import Database # Importa a classe Database do modulo DataBase
 from TELAS.TELA_ADM import TELAABAS_ADM
-# from TELAS.TELA_USUARIO import TELAABAS_USUARIO
+from TELAS.TELA_USUARIO import TELAABAS_USUARIO
 
 class tela_Login:
     def __init__(self,root):
@@ -73,7 +73,7 @@ class tela_Login:
             else:
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Usuário!")
                 self.root.withdraw()  # Oculta a tela de login
-                self.ADM_USUARIO()  # Chama a função para mostrar as abas    
+                self.USUARIO_TELA()  # Chama a função para mostrar as abas    
         else:
             messagebox.showinfo(title="INFO LOGIN", message="Acesso Negado. Verifique se está cadastrado no Sistema!") # Exibe mensagem de erro
 
@@ -86,10 +86,10 @@ class tela_Login:
         app = TELAABAS_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
 
-#    def ADM_NOM(self):
-#        main_window = tk.Toplevel()  # Cria uma nova janela
-#        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-#        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-#        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-#        app = TELAABAS_USUARIO(main_window)  # Cria a instância da tela com as abas
-#        main_window.mainloop()
+    def USUARIO_TELA(self):
+        main_window = tk.Toplevel()  # Cria uma nova janela
+        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
+        app = TELAABAS_USUARIO(main_window)  # Cria a instância da tela com as abas
+        main_window.mainloop()
