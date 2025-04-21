@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import * # Importa todos os módulos do tkinter
 from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkinter
 from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
-from CRUD.CRUD_Funcionarios import Database # Importa a classe Database do modulo DataBase
-from TELA_ADM import TelaAbas_ADM
-from TELA_USUARIO import TelaAbas_ADM
+from CRUD.CRUD_FUNCIONARIO import Database # Importa a classe Database do modulo DataBase
+from TELAS.TELA_ADM import TELAABAS_ADM
+# from TELAS.TELA_USUARIO import TELAABAS_USUARIO
 
 class tela_Login:
     def __init__(self,root):
@@ -17,7 +17,7 @@ class tela_Login:
         self.create_widgets()
     def create_widgets(self):
         # IMAGEM
-        self.logo = PhotoImage(file="icons/LogoForneInjet.png")  # Carrega a imagem da logo
+        self.logo = PhotoImage(file="ICONES/LogoForneInjet.png")  # Carrega a imagem da logo
 
         # FRAMES
         self.LeftFrame = Frame(self.root, width=200, height=300, bg="white", relief="raise")  # Cria um frame à esquerda com fundo branco
@@ -64,7 +64,7 @@ class tela_Login:
         if VerifyLogin:
             is_admin = VerifyLogin[7]  # Supondo que o índice 3 seja a coluna 'is_admin' na sua tabela
             
-            if is_admin == "admin":  # Se o usuário for administrador
+            if is_admin == "Admin":  # Se o usuário for administrador
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
                 # Chama a função para tela de administrador
                 self.root.withdraw()  # Oculta a tela de login
@@ -73,7 +73,7 @@ class tela_Login:
             else:
                 messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Usuário!")
                 self.root.withdraw()  # Oculta a tela de login
-                self.ADM_NOM()  # Chama a função para mostrar as abas    
+                self.ADM_USUARIO()  # Chama a função para mostrar as abas    
         else:
             messagebox.showinfo(title="INFO LOGIN", message="Acesso Negado. Verifique se está cadastrado no Sistema!") # Exibe mensagem de erro
 
@@ -83,13 +83,13 @@ class tela_Login:
         largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
         altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
         main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-        app = TelaAbas_ADM(main_window)  # Cria a instância da tela com as abas
+        app = TELAABAS_ADM(main_window)  # Cria a instância da tela com as abas
         main_window.mainloop()
 
-    def ADM_NOM(self):
-        main_window = tk.Toplevel()  # Cria uma nova janela
-        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-        app = TelaAbas_NORM(main_window)  # Cria a instância da tela com as abas
-        main_window.mainloop()
+#    def ADM_NOM(self):
+#        main_window = tk.Toplevel()  # Cria uma nova janela
+#        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
+#        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
+#        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
+#        app = TELAABAS_USUARIO(main_window)  # Cria a instância da tela com as abas
+#        main_window.mainloop()

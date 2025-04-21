@@ -44,9 +44,9 @@ def deletar_fornecedor(idFornecedor):
 def create_fornecedor(self):
     nome_fornecedor = self.nome_fornecedor_entry.get()
     cnpj = self.cnpj_entry.get()
-    email = self.email_entry.get()
+    email = self.email_fornecedor_entry.get()
     endereco = self.endereco_entry.get()
-    telefone = self.telefone_entry.get()
+    telefone = self.telefone_fornecedor_entry.get()
     contato_principal = self.contato_principal_entry.get()
     website = self.website_entry.get()
 
@@ -54,7 +54,7 @@ def create_fornecedor(self):
         criar_fornecedor(nome_fornecedor, cnpj, email, endereco, telefone, contato_principal, website)
         messagebox.showinfo("Sucesso", "Fornecedor cadastrado com sucesso!")
         self.clear_fornecedor_entries()
-        self.read_fornecedor()  # Atualizar a tabela
+        read_fornecedor(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
@@ -62,7 +62,7 @@ def read_fornecedor(self):
     fornecedores = listar_fornecedor()  # Remover o 'self' aqui
     for row in self.fornecedor_table.get_children():
         self.fornecedor_table.delete(row)  # Limpar a tabela antes de adicionar novos dados
-
+        
     for fornecedor in fornecedores:
         self.fornecedor_table.insert("", "end", values=fornecedor)  # Inserir os dados na tabela
 
@@ -70,9 +70,9 @@ def update_fornecedor(self):
     id_fornecedor = self.id_fornecedor_entry.get()
     nome_fornecedor = self.nome_fornecedor_entry.get()
     cnpj = self.cnpj_entry.get()
-    email = self.email_entry.get()
+    email = self.email_fornecedor_entry.get()
     endereco = self.endereco_entry.get()
-    telefone = self.telefone_entry.get()
+    telefone = self.telefone_fornecedor_entry.get()
     contato_principal = self.contato_principal_entry.get()
     website = self.website_entry.get()
 
@@ -80,7 +80,7 @@ def update_fornecedor(self):
         atualizar_fornecedor(id_fornecedor, nome_fornecedor, cnpj, email, endereco, telefone, contato_principal, website)
         messagebox.showinfo("Sucesso", "Fornecedor atualizado com sucesso!")
         self.clear_fornecedor_entries()
-        self.read_fornecedor()  # Atualizar a tabela
+        read_fornecedor(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
@@ -90,16 +90,16 @@ def delete_fornecedor(self):
         deletar_fornecedor(id_fornecedor)
         messagebox.showinfo("Sucesso", "Fornecedor excluído com sucesso!")
         self.id_fornecedor_entry.delete(0, tk.END)
-        self.read_fornecedor()  # Atualizar a tabela
+        read_fornecedor(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Digite um ID válido para exclusão")
 
 def clear_fornecedor_entries(self):
     self.nome_fornecedor_entry.delete(0, tk.END)
     self.cnpj_entry.delete(0, tk.END)
-    self.email_entry.delete(0, tk.END)
+    self.email_fornecedor_entry.delete(0, tk.END)
     self.endereco_entry.delete(0, tk.END)
-    self.telefone_entry.delete(0, tk.END)
+    self.telefone_fornecedor_entry.delete(0, tk.END)
     self.contato_principal_entry.delete(0, tk.END)
     self.website_entry.delete(0, tk.END)
     self.id_fornecedor_entry.delete(0, tk.END)

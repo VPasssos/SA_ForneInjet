@@ -52,8 +52,8 @@ def deletar_funcionario(idFuncionario):
 def create_funcionario(self):
     nome_funcionario = self.nome_funcionario_entry.get()
     cargo = self.cargo_entry.get()
-    telefone = self.telefone_entry.get()
-    email = self.email_entry.get()
+    telefone = self.telefone_funcionario_entry.get()
+    email = self.email_funcionario_entry.get()
     data_admissao = self.data_admissao_entry.get()
     situacao = self.situacao_entry.get()
     permissao = self.permissao_entry.get()
@@ -63,8 +63,8 @@ def create_funcionario(self):
     if nome_funcionario and cargo and telefone and email and data_admissao and situacao and permissao and usuario and senha:
         criar_funcionario(nome_funcionario, cargo, telefone, email, data_admissao, situacao, permissao, usuario, senha)
         messagebox.showinfo("Sucesso", "Funcionário cadastrado com sucesso!")
-        self.clear_funcionario_entries()
-        self.read_funcionario()  # Atualizar a tabela
+        clear_funcionario_entries(self)
+        read_funcionario(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
@@ -74,8 +74,8 @@ def read_funcionario(self):
     
     # Limpa a tabela de funcionários antes de adicionar novos dados
     for row in self.funcionario_table.get_children():
-        self.fornecedor_table.insert("", "end", values=funcionario)  # Inserir os dados na tabela
-
+        self.funcionario_table.delete(row)
+        
     # Insere cada funcionário na tabela
     for funcionario in funcionarios:
         self.funcionario_table.insert("", "end", values=funcionario)  # Insere cada linha na tabela
@@ -85,8 +85,8 @@ def update_funcionario(self):
     id_funcionario = self.id_funcionario_entry.get()
     nome_funcionario = self.nome_funcionario_entry.get()
     cargo = self.cargo_entry.get()
-    telefone = self.telefone_entry.get()
-    email = self.email_entry.get()
+    telefone = self.telefone_funcionario_entry.get()
+    email = self.email_funcionario_entry.get()
     data_admissao = self.data_admissao_entry.get()
     situacao = self.situacao_entry.get()
     permissao = self.permissao_entry.get()
@@ -96,8 +96,8 @@ def update_funcionario(self):
     if id_funcionario and nome_funcionario and cargo and telefone and email and data_admissao and situacao and permissao and usuario and senha:
         atualizar_funcionario(id_funcionario, nome_funcionario, cargo, telefone, email, data_admissao, situacao, permissao, usuario, senha)
         messagebox.showinfo("Sucesso", "Funcionário atualizado com sucesso!")
-        self.clear_funcionario_entries()
-        self.read_funcionario()  # Atualizar a tabela
+        clear_funcionario_entries(self)
+        read_funcionario(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
@@ -107,15 +107,15 @@ def delete_funcionario(self):
         deletar_funcionario(id_funcionario)
         messagebox.showinfo("Sucesso", "Funcionário excluído com sucesso!")
         self.id_funcionario_entry.delete(0, tk.END)
-        self.read_funcionario()  # Atualizar a tabela
+        read_funcionario(self)  # Atualizar a tabela
     else:
         messagebox.showerror("Erro", "Digite um ID válido para exclusão")
 
 def clear_funcionario_entries(self):
     self.nome_funcionario_entry.delete(0, tk.END)
     self.cargo_entry.delete(0, tk.END)
-    self.telefone_entry.delete(0, tk.END)
-    self.email_entry.delete(0, tk.END)
+    self.telefone_funcionario_entry.delete(0, tk.END)
+    self.email_funcionario_entry.delete(0, tk.END)
     self.data_admissao_entry.delete(0, tk.END)
     self.situacao_entry.delete(0, tk.END)
     self.permissao_entry.delete(0, tk.END)
