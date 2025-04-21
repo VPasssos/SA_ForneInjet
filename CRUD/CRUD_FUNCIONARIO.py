@@ -69,17 +69,11 @@ def create_funcionario(self):
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
 def read_funcionario(self):
-    # Chama a função de listagem de funcionários e armazena os dados retornados
     funcionarios = listar_funcionario()  # Função que retorna uma lista de dados de funcionários
-    
-    # Limpa a tabela de funcionários antes de adicionar novos dados
     for row in self.funcionario_table.get_children():
         self.funcionario_table.delete(row)
-        
-    # Insere cada funcionário na tabela
     for funcionario in funcionarios:
         self.funcionario_table.insert("", "end", values=funcionario)  # Insere cada linha na tabela
-
 
 def update_funcionario(self):
     id_funcionario = self.id_funcionario_entry.get()
@@ -125,7 +119,6 @@ def clear_funcionario_entries(self):
 
 class Database:
     def __init__(self):
-        # Conecta ao banco de dados MySQL com as credenciais fornecidas
         self.conn = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -134,14 +127,13 @@ class Database:
         )
         self.cursor = self.conn.cursor()  # Cria um cursor para executar comandos SQL
         
-        # Criação da tabela "funcionario", se ela não existir
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS funcionario (
                                 idFuncionario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                 nome_funcionario TEXT,
                                 email TEXT,
                                 telefone TEXT,
                                 cargo TEXT,
-                                data_admissao DATE,  # Ou altere para DATE, se necessário
+                                data_admissao DATE,
                                 situacao TEXT,
                                 permissao TEXT,
                                 usuario TEXT,
@@ -150,6 +142,5 @@ class Database:
         self.conn.commit()  # Confirma criação da tabela
         print("Conectado ao banco de dados")
 
-    # Método chamado quando a instância da classe é destruída
     def close_connection(self):
         self.conn.close()  # Fecha a conexão com o banco de dados

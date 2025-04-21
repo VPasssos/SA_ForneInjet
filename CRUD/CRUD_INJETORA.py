@@ -3,11 +3,18 @@ from tkinter import messagebox
 import tkinter as tk
 from tkinter import ttk
 
-def criar_injetora(quantidade, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD, preço_medio_BRL, fornecedor, observacao):
+def criar_injetora(quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento, tipo_de_controle, preco_medio_USD, preco_medio_BRL, fornecedor, observacao):
     conn = get_connection()
     cursor = conn.cursor()
-    query = "INSERT INTO Injetora (quantidade, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD, preço_medio_BRL, fornecedor, observacao) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    cursor.execute(query, (quantidade, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD, preço_medio_BRL, fornecedor, observacao))
+    query = """
+        INSERT INTO Injetora (
+            quantidade, marca, modelo, capacidade_de_injecao,
+            forca_de_fechamento, tipo_de_controle, preco_medio_USD,
+            preco_medio_BRL, fornecedor, observacao
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(query, (quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento,
+                           tipo_de_controle, preco_medio_USD, preco_medio_BRL, fornecedor, observacao))
     conn.commit()
     cursor.close()
     conn.close()
@@ -22,11 +29,26 @@ def listar_injetora():
     conn.close()
     return result
 
-def atualizar_injetora(quantidade, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD, preço_medio_BRL, fornecedor, observacao, idMaquinas):
+def atualizar_injetora(idMaquinas, quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento,
+                       tipo_de_controle, preco_medio_USD, preco_medio_BRL, fornecedor, observacao):
     conn = get_connection()
     cursor = conn.cursor()
-    query = "UPDATE injetora SET quantidade = %s, marca = %s, modelo = %s, capacidade_de_injeçao = %s, força_de_fechamento = %s, tipo_de_controle = %s, preço_medio_USD = %s, preço_medio_BRL = %s, fornecedor = %s, observacao = %s WHERE idMaquinas = %s"
-    cursor.execute(query, (quantidade, marca, modelo, capacidade_de_injeçao, força_de_fechamento, tipo_de_controle, preço_medio_USD, preço_medio_BRL, fornecedor, observacao, idMaquinas))
+    query = """
+        UPDATE Injetora SET
+            quantidade = %s,
+            marca = %s,
+            modelo = %s,
+            capacidade_de_injecao = %s,
+            forca_de_fechamento = %s,
+            tipo_de_controle = %s,
+            preco_medio_USD = %s,
+            preco_medio_BRL = %s,
+            fornecedor = %s,
+            observacao = %s
+        WHERE idMaquinas = %s
+    """
+    cursor.execute(query, (quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento,
+                           tipo_de_controle, preco_medio_USD, preco_medio_BRL, fornecedor, observacao, idMaquinas))
     conn.commit()
     cursor.close()
     conn.close()
@@ -54,29 +76,21 @@ def create_injetora(self):
     observacao = self.observacao_entry.get()
 
     if quantidade and marca and modelo and capacidade_de_injecao and forca_de_fechamento and tipo_de_controle and preco_medio_usd and preco_medio_brl and fornecedor and observacao:
-        criar_injetora(quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento, tipo_de_controle, preco_medio_usd, preco_medio_brl, fornecedor, observacao)
-        messagebox.showinfo("Sucesso", "Injetora cadastrado com sucesso!")
+        criar_injetora(quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento,
+                       tipo_de_controle, preco_medio_usd, preco_medio_brl, fornecedor, observacao)
+        messagebox.showinfo("Sucesso", "Injetora cadastrada com sucesso!")
         clear_injetora_entries(self)
-
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
 def read_injetora(self):
-    # Aqui você deve chamar a função para listar os injetoras
-    injetoras = listar_injetora()  # Lista de injetoras retornada pela função listar_injetora()
-
-    # Limpar a tabela antes de adicionar novos dados
+    injetoras = listar_injetora()
     for row in self.injetora_table.get_children():
         self.injetora_table.delete(row)
-
-    # Inserir os dados na tabela
     for injetora in injetoras:
-        # A função insert insere uma nova linha na tabela com os dados do injetora
-        # Supondo que 'injetora' seja uma lista ou tupla de valores correspondentes às colunas da tabela
         self.injetora_table.insert("", "end", values=injetora)
 
 def update_injetora(self):
-    # Usando a variável correta para ID do injetora
     id_maquinas = self.id_maquinas_entry.get()
     quantidade = self.quantidade_entry.get()
     marca = self.marca_entry.get()
@@ -88,26 +102,26 @@ def update_injetora(self):
     preco_medio_brl = self.preco_brl_entry.get()
     fornecedor = self.fornecedor_injetora_entry.get()
     observacao = self.observacao_entry.get()
+
     clear_injetora_entries(self)
-    # Verificando se todos os campos obrigatórios estão preenchidos
+
     if id_maquinas and quantidade and marca and modelo and capacidade_de_injecao and forca_de_fechamento and tipo_de_controle and preco_medio_usd and preco_medio_brl and fornecedor and observacao:
-        atualizar_injetora(id_maquinas, quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento, tipo_de_controle, preco_medio_usd, preco_medio_brl, fornecedor, observacao)
-        messagebox.showinfo("Sucesso", "Injetora atualizado com sucesso!")
+        atualizar_injetora(id_maquinas, quantidade, marca, modelo, capacidade_de_injecao, forca_de_fechamento,
+                           tipo_de_controle, preco_medio_usd, preco_medio_brl, fornecedor, observacao)
+        messagebox.showinfo("Sucesso", "Injetora atualizada com sucesso!")
     else:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios")
 
 def delete_injetora(self):
-    # Usando a variável correta para ID do injetora
     id_maquinas = self.id_maquinas_entry.get()
     if id_maquinas:
         deletar_injetora(id_maquinas)
-        messagebox.showinfo("Sucesso", "Injetora excluído com sucesso!")
-        self.id_maquinas_entry.delete(0, tk.END)  # Limpar o campo de ID após exclusão
+        messagebox.showinfo("Sucesso", "Injetora excluída com sucesso!")
+        self.id_maquinas_entry.delete(0, tk.END)
     else:
         messagebox.showerror("Erro", "Digite um ID válido para exclusão")
 
 def clear_injetora_entries(self):
-    # Limpando todos os campos da aba Injetora
     self.quantidade_entry.delete(0, tk.END)
     self.marca_entry.delete(0, tk.END)
     self.modelo_entry.delete(0, tk.END)
@@ -118,4 +132,4 @@ def clear_injetora_entries(self):
     self.preco_brl_entry.delete(0, tk.END)
     self.fornecedor_injetora_entry.delete(0, tk.END)
     self.observacao_entry.delete(0, tk.END)
-    self.id_maquinas_entry.delete(0, tk.END)  # Limpar também o campo de ID
+    self.id_maquinas_entry.delete(0, tk.END)
