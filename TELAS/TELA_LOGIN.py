@@ -1,95 +1,100 @@
-# IMPORTAR AS BIBLIOTECAS
 import tkinter as tk
-from tkinter import * # Importa todos os módulos do tkinter
-from tkinter import messagebox # Importa o modulo de caixas de mensagem do tkinter
-from tkinter import ttk # Importa o modulo de widgets tematicos o tkinter
-from CRUD.CRUD_FUNCIONARIO import Database # Importa a classe Database do modulo DataBase
-from TELAS.TELA_ADM import TELAABAS_ADM
-from TELAS.TELA_USUARIO import TELAABAS_USUARIO
+from tkinter import ttk, messagebox, PhotoImage, Frame, Label
+from CRUD.CRUD_FUNCIONARIO import Database
+from TELAS.TELA_ADM import TelaPrincipal
 
-class tela_Login:
-    def __init__(self,root):
+class TelaLogin:
+    def __init__(self, root):
         self.root = root
         self.root.title("SA ForneInjet - Painel de Acesso")
         self.root.geometry("600x300")
         self.root.configure(background="white")
-        self.root.attributes("-alpha", 0.9)  # Define a transparência da janela (0.0 a 1.0)
-        self.create_widgets()
-    def create_widgets(self):
-        # IMAGEM
-        self.logo = PhotoImage(file="ICONES/LogoForneInjet.png")  # Carrega a imagem da logo
+        self.root.attributes("-alpha", 0.9)
+        
+        # Carregar recursos
+        self.logo = PhotoImage(file="ICONES/LogoForneInjet.png")
+        
+        # Configurar layout
+        self.configurar_interface()
+        
+        # Conectar ao banco
+        self.db = Database()
 
-        # FRAMES
-        self.LeftFrame = Frame(self.root, width=200, height=300, bg="white", relief="raise")  # Cria um frame à esquerda com fundo branco
-        self.LeftFrame.pack(side=LEFT)  # Posiciona o frame à esquerda
+    def configurar_interface(self):
+        """Configura todos os elementos da interface"""
+        # Frame esquerdo (logo)
+        left_frame = Frame(self.root, width=200, height=300, bg="white", relief="raise")
+        left_frame.pack(side=tk.LEFT, fill=tk.Y)
+        
+        logo_label = Label(left_frame, image=self.logo, bg="white")
+        logo_label.place(x=25, y=85)
 
-        self.RightFrame = Frame(self.root, width=395, height=300, bg="white", relief="raise")  # Cria um frame à direita com fundo branco
-        self.RightFrame.pack(side=RIGHT)  # Posiciona o frame à direita
+        # Frame direito (formulário)
+        right_frame = Frame(self.root, width=395, height=300, bg="white", relief="raise")
+        right_frame.pack(side=tk.RIGHT, expand=True, fill=tk.BOTH)
 
-        # LOGO
-        self.LogoLabel = Label(self.LeftFrame,image=self.logo, bg="white")  # Cria uma label que carrega a logo
-        self.LogoLabel.place(x=25, y=85)  # Posiciona o label no frame esquerdo
+        # Campos de login
+        ttk.Label(right_frame, text="Usuário:", font=("Century Gothic", 20), 
+                 background="white").place(x=5, y=100)
+        self.usuario_entry = ttk.Entry(right_frame, width=30)
+        self.usuario_entry.place(x=120, y=115)
+        self.usuario_entry.focus()
 
-        # ADICIONAR CAMPOS DE USUARIO E SENHA
-        self.UsuarioLabel = Label(self.RightFrame, text="Usuario:", font=("Century Gothic", 20), bg="white", fg="black")  # Cria um label para o usuario
-        self.UsuarioLabel.place(x=5, y=100)  # Posiciona o label no frame direito
+        ttk.Label(right_frame, text="Senha:", font=("Century Gothic", 20), 
+                 background="white").place(x=5, y=150)
+        self.senha_entry = ttk.Entry(right_frame, width=30, show="*")
+        self.senha_entry.place(x=120, y=165)
 
-        self.UsuarioEntry = ttk.Entry(self.RightFrame,width=30)  # Cria um campo de entrada para o usuario
-        self.UsuarioEntry.place(x=120, y=115)  # Posiciona o campo de entrada
+        # Botão de login
+        ttk.Button(right_frame, text="LOGIN", width=15, 
+                  command=self.verificar_login).place(x=80, y=225)
+        
+        # Configurar tecla Enter para login
+        self.root.bind('<Return>', lambda event: self.verificar_login())
 
-        self.SenhaLabel = Label(self.RightFrame,text="Senha:", font=("Century Gothic", 20), bg="white", fg="black")  # Cria um label para a senha
-        self.SenhaLabel.place(x=5, y=150)  # Posiciona o label no frame direito
+    def verificar_login(self):
+        """Verifica as credenciais do usuário"""
+        usuario = self.usuario_entry.get().strip()
+        senha = self.senha_entry.get().strip()
 
-        self.SenhaEntry = ttk.Entry(self.RightFrame, width=30, show="*")  # Cria um campo de entrada para a senha
-        self.SenhaEntry.place(x=120, y=165)  # Posiciona o campo de entrada
+        if not usuario or not senha:
+            messagebox.showwarning("Aviso", "Preencha todos os campos!")
+            return
 
-        # CRIANDO BOTOES
-        self.LoginButton = ttk.Button(self.RightFrame,text="LOGIN", width=15, command=self.Login) # Cria um botao de login
-        self.LoginButton.place(x=80, y=225) # Posiciona o botao de login
-    
-    # FUNCAO DE LOGIN
-    
-    def Login(self):
-        usuario = self.UsuarioEntry.get() # Obtem o valor do campo de entrada 'UsuarioEntry'
-        senha = self.SenhaEntry.get() # Obtem o valor do campo de entrada 'SenhaEntry'
-
-        # Conectar ao banco de dados
-        db = Database() # Cria uma instancia da classe Database
-        db.cursor.execute("""
-        SELECT * FROM funcionario
-        WHERE usuario = %s AND senha = %s""",(usuario, senha)) # execulta a consulta SQL para verificar o usuario e a senha
-        VerifyLogin = db.cursor.fetchone() # Obtem o resultado da consulta
-
-        # Verificar se o usuario foi encontrado
-        if VerifyLogin:
-            is_admin = VerifyLogin[7]  # Supondo que o índice 3 seja a coluna 'is_admin' na sua tabela
+        try:
+            self.db.cursor.execute("""
+                SELECT permissao FROM funcionario
+                WHERE usuario = %s AND senha = %s
+            """, (usuario, senha))
             
-            if is_admin == "Admin":  # Se o usuário for administrador
-                messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Administrador!")
-                # Chama a função para tela de administrador
-                self.root.withdraw()  # Oculta a tela de login
-                self.ADM_Tela()  # Chama a função para mostrar as abas
+            resultado = self.db.cursor.fetchone()
 
+            if resultado:
+                permissao = resultado[0]
+                mensagem = "Bem-vindo, Administrador!" if permissao == "admin" else "Bem-vindo, Usuário!"
+                messagebox.showinfo("Login", f"Acesso Confirmado. {mensagem}")
+                
+                self.root.withdraw()
+                self.abrir_tela_principal(permissao)
             else:
-                messagebox.showinfo(title="INFO LOGIN", message="Acesso Confirmado. Bem-vindo, Usuário!")
-                self.root.withdraw()  # Oculta a tela de login
-                self.USUARIO_TELA()  # Chama a função para mostrar as abas    
-        else:
-            messagebox.showinfo(title="INFO LOGIN", message="Acesso Negado. Verifique se está cadastrado no Sistema!") # Exibe mensagem de erro
+                messagebox.showerror("Erro", "Credenciais inválidas!")
 
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao verificar login: {str(e)}")
 
-    def ADM_Tela(self):
-        main_window = tk.Toplevel()  # Cria uma nova janela
-        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-        app = TELAABAS_ADM(main_window)  # Cria a instância da tela com as abas
-        main_window.mainloop()
+    def abrir_tela_principal(self, permissao):
+        """Abre a tela principal conforme a permissão"""
+        main_window = tk.Toplevel()
+        main_window.state('zoomed')  # Maximiza a janela
+        
+        if permissao == "admin":
+            TelaPrincipal(main_window)
+        # else:
+        #     TELAABAS_USUARIO(main_window)  # Descomente quando implementar
+            
+        main_window.protocol("WM_DELETE_WINDOW", self.fechar_aplicacao)
 
-    def USUARIO_TELA(self):
-        main_window = tk.Toplevel()  # Cria uma nova janela
-        largura_tela = main_window.winfo_screenwidth() # Obtém as dimensões da tela
-        altura_tela = main_window.winfo_screenheight() # Obtém as dimensões da tela
-        main_window.geometry(f"{largura_tela}x{altura_tela}+0+0")  # Define o tamanho da nova janela
-        app = TELAABAS_USUARIO(main_window)  # Cria a instância da tela com as abas
-        main_window.mainloop()
+    def fechar_aplicacao(self):
+        """Fecha todas as janelas e encerra a aplicação"""
+        self.db.close_connection()
+        self.root.destroy()

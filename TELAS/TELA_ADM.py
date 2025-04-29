@@ -1,325 +1,281 @@
 import tkinter as tk
-from tkinter import ttk
-from CRUD.CRUD_INJETORA import create_injetora, read_injetora, update_injetora, delete_injetora, clear_injetora_entries
-from CRUD.CRUD_FORNECEDOR import create_fornecedor, read_fornecedor, update_fornecedor, delete_fornecedor, clear_fornecedor_entries
-from CRUD.CRUD_FUNCIONARIO import create_funcionario, read_funcionario, update_funcionario, delete_funcionario, clear_funcionario_entries
-class TELAABAS_ADM:
+from tkinter import ttk, messagebox
+from CRUD.CRUD_INJETORA import *
+from CRUD.CRUD_FORNECEDOR import *
+from CRUD.CRUD_FUNCIONARIO import *
+import re
+
+class TelaPrincipal:
     def __init__(self, root):
         self.root = root
-        self.root.title("Tela Principal - Abas")
-        self.root.configure(background="white")
-
-        # Criar um Notebook (abas) para alternar entre Funcionario, Injetora e Fornecedor
+        self.root.title("Sistema ForneInjet - Gestão Completa")
+        self.root.geometry("1200x800")
+        
+        # Variáveis de controle
+        self.funcionario_logado_id = 1
+        self.fornecedores_disponiveis = {}
+        
+        self.criar_widgets()
+        self.carregar_fornecedores_combobox()
+    
+    def criar_widgets(self):
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True)
-
-        # Aba Inicial
-        self.inicio_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.inicio_frame, text="Inicio")
-        self.create_inicio_widgets()
-
-        # Aba injetoras
-        self.injetora_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.injetora_frame, text="Injetora")
-        self.create_injetora_widgets()
-
-        # Aba fornecedor
-        self.fornecedor_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.fornecedor_frame, text="Fornecedor")
-        self.create_fornecedor_widgets()
-
-        # Aba Funcionario
-        self.funcionario_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.funcionario_frame, text="Funcionario")
-        self.create_funcionario_widgets()
-
-    # Métodos para a aba inicial
-    def create_inicio_widgets(self):
-        # Adicionando o texto de boas-vindas
-        welcome_label = tk.Label(self.inicio_frame, text="Seja bem-vindo ao Forninet!", 
-                                font=("Century Gothic", 20, "bold"), fg="black")
-        welcome_label.pack(pady=20)
-
-    # Métodos para a aba injetora
-    def create_injetora_widgets(self):
-        labels_injetora = ["Quantidade", "Marca", "Modelo", "Capacidade de Injeção", "Força de Fechamento", 
-                        "Tipo de Controle", "Preço Médio (USD)", "Preço Médio (BRL)", "Fornecedor", "Observação"]
-        self.entries_injetora = self.create_entries(self.injetora_frame, labels_injetora)
         
-        # Adicionando o campo ID para injetora
-        self.id_maquinas_entry = ttk.Entry(self.injetora_frame, width=50)
-        self.id_maquinas_entry.grid(row=len(labels_injetora), column=1, padx=10, pady=5, sticky="w")
-        self.id_maquinas_entry.grid_remove()
-        # Definindo as entradas específicas da aba injetora
-        self.quantidade_entry = self.entries_injetora["Quantidade"]
-        self.marca_entry = self.entries_injetora["Marca"]
-        self.modelo_entry = self.entries_injetora["Modelo"]
-        self.capacidade_entry = self.entries_injetora["Capacidade de Injeção"]
-        self.forca_fechar_entry = self.entries_injetora["Força de Fechamento"]
-        self.tipo_controle_entry = self.entries_injetora["Tipo de Controle"]
-        self.preco_usd_entry = self.entries_injetora["Preço Médio (USD)"]
-        self.preco_brl_entry = self.entries_injetora["Preço Médio (BRL)"]
-        self.fornecedor_injetora_entry = self.entries_injetora["Fornecedor"]
-        self.observacao_entry = self.entries_injetora["Observação"]
-
-        # Botões CRUD separados para Injetora
-        self.create_crud_widgets_injetora(self.injetora_frame)
-
-        # Tabela para Injetoras
-        self.create_injetora_table(self.injetora_frame)
-        read_injetora(self)
+        self.criar_aba_inicio()
+        self.criar_aba_injetoras()
+        self.criar_aba_fornecedores()
+        self.criar_aba_funcionarios()
+    
+    def criar_aba_inicio(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="Início")
         
-        # Vincular evento de seleção na tabela
-        self.injetora_table.bind("<ButtonRelease-1>", self.on_table_select_injetora)
-
-    def criar_injetora(self):
-        create_injetora(self)
-        read_injetora(self)
+        lbl = tk.Label(frame, text="Bem-vindo ao Sistema ForneInjet", 
+                      font=("Arial", 18), pady=20)
+        lbl.pack()
+    
+    def criar_aba_injetoras(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="Injetoras")
         
-    def listar_injetoras(self):
-        read_injetora(self)
-
-    def atualizar_injetora(self):
-        update_injetora(self)
-        read_injetora(self)
-
-    def deletetar_injetora(self):
-        delete_injetora(self)
-        read_injetora(self)
-
-    # Métodos para a aba fornecedor
-    def create_fornecedor_widgets(self):
-        labels_fornecedor = ["Nome do Fornecedor", "CNPJ", "Email Fornecedor", "Endereço", "Telefone Fornecedor", "Contato Principal", "Website"]
-        self.entries_fornecedor = self.create_entries(self.fornecedor_frame, labels_fornecedor)
+        form_frame = ttk.LabelFrame(frame, text="Dados da Injetora", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)
         
-        # Adicionando o campo ID para fornecedor
-        self.id_fornecedor_entry = ttk.Entry(self.fornecedor_frame, width=50)
-        self.id_fornecedor_entry.grid(row=len(labels_fornecedor), column=1, padx=10, pady=5, sticky="w")
-        self.id_fornecedor_entry.grid_remove()
-        # Definindo as entradas específicas da aba fornecedor
-        self.nome_fornecedor_entry = self.entries_fornecedor["Nome do Fornecedor"]
-        self.cnpj_entry = self.entries_fornecedor["CNPJ"]
-        self.email_fornecedor_entry = self.entries_fornecedor["Email Fornecedor"]
-        self.endereco_entry = self.entries_fornecedor["Endereço"]
-        self.telefone_fornecedor_entry = self.entries_fornecedor["Telefone Fornecedor"]
-        self.contato_principal_entry = self.entries_fornecedor["Contato Principal"]
-        self.website_entry = self.entries_fornecedor["Website"]
-
-        # Botões CRUD separados para Fornecedor
-        self.create_crud_widgets_fornecedor(self.fornecedor_frame)
-
-        # Tabela para Fornecedores
-        self.create_fornecedor_table(self.fornecedor_frame)
-        read_fornecedor(self)
+        campos = [
+            ("Marca", 0, 0), ("Modelo", 0, 2), 
+            ("Tipo de Controle", 1, 0), ("Capacidade de Injeção (g)", 1, 2),
+            ("Força de Fechamento (ton)", 2, 0), ("Preço Médio (USD)", 2, 2),
+            ("Preço Médio (BRL)", 3, 0), ("Quantidade", 3, 2),
+            ("Observações", 4, 0), ("Fornecedor", 4, 2)
+        ]
         
-        # Vincular evento de seleção na tabela
-        self.fornecedor_table.bind("<ButtonRelease-1>", self.on_table_select_fornecedor)
-
-    def criar_fornecedor(self):
-        create_fornecedor(self)
-        read_fornecedor(self)
-
-    def listar_fornecedor(self):
-        read_fornecedor(self)
-
-    def atualizar_fornecedor(self):
-        update_fornecedor(self)
-        read_fornecedor(self)
-
-    def deletetar_fornecedor(self):
-        delete_fornecedor(self)
-        read_fornecedor(self)
-
-    def clear_fornecedor_entries(self):
-        self.nome_fornecedor_entry.delete(0, tk.END)
-        self.cnpj_entry.delete(0, tk.END)
-        self.email_fornecedor_entry.delete(0, tk.END)
-        self.endereco_entry.delete(0, tk.END)
-        self.telefone_fornecedor_entry.delete(0, tk.END)
-        self.contato_principal_entry.delete(0, tk.END)
-        self.website_entry.delete(0, tk.END)
-        self.id_fornecedor_entry.delete(0, tk.END)
-
-    # Métodos para a aba funcionario
-    def create_funcionario_widgets(self):
-        labels_funcionario = ["Nome", "Cargo", "Telefone Funcionário", "Email Funcionário", "Data de Admissão", "Situação", "Permissão", 
-                            "Usuário", "Senha"]
-        self.entries_funcionario = self.create_entries(self.funcionario_frame, labels_funcionario)
-        
-        # Adicionando o campo ID para funcionario
-        self.id_funcionario_entry = ttk.Entry(self.funcionario_frame, width=50)
-        self.id_funcionario_entry.grid(row=len(labels_funcionario), column=1, padx=10, pady=5, sticky="w")
-        self.id_funcionario_entry.grid_remove()
-        # Definindo as entradas específicas da aba funcionario
-        self.nome_funcionario_entry = self.entries_funcionario["Nome"]
-        self.cargo_entry = self.entries_funcionario["Cargo"]
-        self.telefone_funcionario_entry = self.entries_funcionario["Telefone Funcionário"]
-        self.email_funcionario_entry = self.entries_funcionario["Email Funcionário"]
-        self.data_admissao_entry = self.entries_funcionario["Data de Admissão"]
-        self.situacao_entry = self.entries_funcionario["Situação"]
-        self.permissao_entry = self.entries_funcionario["Permissão"]
-        self.usuario_entry = self.entries_funcionario["Usuário"]
-        self.senha_entry = self.entries_funcionario["Senha"]
-
-        # Botões CRUD separados para Funcionario
-        self.create_crud_widgets_funcionario(self.funcionario_frame)
-
-        # Tabela para Funcionários
-        self.create_funcionario_table(self.funcionario_frame)
-        read_funcionario(self)
-        
-        # Vincular evento de seleção na tabela
-        self.funcionario_table.bind("<ButtonRelease-1>", self.on_table_select_funcionario)
-
-    def criar_funcionario(self):
-        create_funcionario(self)
-        read_funcionario(self)
-
-    def listar_funcionarios(self):
-        read_funcionario(self)
-
-    def atualizar_funcionario(self):
-        update_funcionario(self)
-        read_funcionario(self)
-
-    def deletetar_funcionario(self):
-        delete_funcionario(self)
-        read_funcionario(self)
-
-    # Método para criar os Entry widgets para uma aba específica
-    def create_entries(self, frame, labels):
-        """Cria os widgets Entry para os labels fornecidos"""
-        entries = {}
-        for i, label in enumerate(labels):
-            # Criar o label
-            tk.Label(frame, text=f"{label}: ", font=("Century Gothic", 15), fg="black").grid(row=i, column=0, padx=10, pady=5, sticky="w")
-            # Criar a entrada (Entry)
-            entries[label] = ttk.Entry(frame, width=50)
-            entries[label].grid(row=i, column=1, padx=10, pady=5, sticky="w")
-        return entries
-
-    # Métodos para os botões CRUD nas diferentes abas
-    def create_crud_widgets_injetora(self, frame):
-        search_frame = ttk.Frame(frame)
-        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
-
-        ttk.Button(search_frame, text="CRIAR INJETORA", command=self.criar_injetora, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="LISTAR INJETORA", command=self.listar_injetoras, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="ATUALIZAR INJETORA", command=self.atualizar_injetora, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="EXCLUIR INJETORA", command=self.deletetar_injetora, style='TButton').pack(side="left", padx=5, pady=5)
-
-    def create_crud_widgets_fornecedor(self, frame):
-        search_frame = ttk.Frame(frame)
-        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
-
-        ttk.Button(search_frame, text="CRIAR FORNECEDOR", command=self.criar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="LISTAR FORNECEDOR", command=self.listar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="ATUALIZAR FORNECEDOR", command=self.atualizar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="EXCLUIR FORNECEDOR", command=self.deletetar_fornecedor, style='TButton').pack(side="left", padx=5, pady=5)
-
-    def create_crud_widgets_funcionario(self, frame):
-        search_frame = ttk.Frame(frame)
-        search_frame.grid(row=10, column=0, columnspan=2, pady=10, sticky="w")
-
-        ttk.Button(search_frame, text="CRIAR FUNCIONÁRIO", command=self.criar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="LISTAR FUNCIONÁRIO", command=self.listar_funcionarios, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="ATUALIZAR FUNCIONÁRIO", command=self.atualizar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
-        ttk.Button(search_frame, text="EXCLUIR FUNCIONÁRIO", command=self.deletetar_funcionario, style='TButton').pack(side="left", padx=5, pady=5)
-
-    # Métodos para as tabelas de cada aba
-    def create_injetora_table(self, frame):
-        columns = ["ID", "Quantidade", "Marca", "Modelo", "Capacidade de Injeção", "Força de Fechamento", 
-                   "Tipo de Controle", "Preço Médio (USD)", "Preço Médio (BRL)", "Fornecedor", "Observação"]
-        self.injetora_table = self.create_table(frame, columns)
-
-    def create_fornecedor_table(self, frame):
-        columns = ["ID", "Nome do Fornecedor", "CNPJ", "Email Fornecedor", "Endereço", "Telefone Fornecedor", "Contato Principal", "Website"]
-        self.fornecedor_table = self.create_table(frame, columns)
-
-    def create_funcionario_table(self, frame):
-        columns = ["ID", "Nome", "Cargo", "Telefone Funcionário", "Email Funcionário", "Data de Admissão", "Situação", "Permissão", 
-                   "Usuário", "Senha"]
-        self.funcionario_table = self.create_table(frame, columns)
-
-    def create_table(self, frame, columns):
-        tree = ttk.Treeview(frame, columns=columns, show="headings")
-        for col in columns:
-            tree.heading(col, text=col)
-            if col == "ID":
-                tree.column(col, width=50, anchor="center")  # Coluna ID
-            elif col == "Endereço" or col == "Observação" or col == "Email Fornecedor" or col == "Email Funcionário ":
-                tree.column(col, width=255, anchor="w")  # Colunas mais largas
-            elif col == "Quantidade" or col == "Marca" or col == "Permissão" or col == "Situação" or col == "Modelo":
-                tree.column(col, width=75, anchor="center")  # Colunas pequenas
+        self.entries_injetora = {}
+        for campo, row, col in campos:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
+            
+            if campo == "Fornecedor":
+                entry = ttk.Combobox(form_frame, width=30)
+                self.fornecedor_cb_injetora = entry
             else:
-                tree.column(col, width=170, anchor="center")  # Colunas médias
-        tree.grid(row=11, column=0, columnspan=2, pady=10, sticky="nsew")
+                entry = ttk.Entry(form_frame, width=30)
+            
+            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
+            self.entries_injetora[campo] = entry
         
-        # Adicionar scrollbar
-        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-        scrollbar.grid(row=11, column=2, sticky="ns")
-        tree.configure(yscrollcommand=scrollbar.set)
+        self.injetora_id = ttk.Entry(form_frame)
+        self.injetora_id.grid(row=0, column=4)
+        self.injetora_id.grid_remove()
         
-        return tree
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill="x", padx=10, pady=5)
+        
+        botoes = [
+            ("Novo", lambda: limpar_campos_injetora(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id)),
+            ("Salvar", lambda: salvar_injetora_gui(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id, self.tree_injetoras)),
+            ("Excluir", lambda: excluir_injetora_gui(self.injetora_id, self.tree_injetoras))
+        ]
+        
+        for i, (texto, cmd) in enumerate(botoes):
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)
+            btn.grid(row=0, column=i, padx=5)
+        
+        table_frame = ttk.Frame(frame)
+        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        cols = ["ID", "Marca", "Modelo", "Tipo", "Capacidade", "Força", "Preço USD", "Preço BRL", "Qtd", "Fornecedor"]
+        self.tree_injetoras = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
+        
+        for col in cols:
+            self.tree_injetoras.heading(col, text=col)
+            self.tree_injetoras.column(col, width=100)
+        
+        scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_injetoras.yview)
+        scroll.pack(side="right", fill="y")
+        self.tree_injetoras.configure(yscrollcommand=scroll.set)
+        
+        self.tree_injetoras.pack(fill="both", expand=True)
+        carregar_injetoras_na_tabela(self.tree_injetoras)
+        self.tree_injetoras.bind("<ButtonRelease-1>", self.selecionar_injetora)
+    
+    def criar_aba_fornecedores(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="Fornecedores")
+        
+        form_frame = ttk.LabelFrame(frame, text="Dados do Fornecedor", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)
+        
+        campos = [
+            ("Nome", 0, 0), ("CNPJ", 0, 2),
+            ("Telefone", 1, 0), ("E-mail", 1, 2),
+            ("Website", 2, 0), ("Rua", 2, 2),
+            ("Número", 3, 0), ("Bairro", 3, 2),
+            ("Cidade", 4, 0), ("Estado", 4, 2),
+            ("CEP", 5, 0)
+        ]
+        
+        self.entries_fornecedor = {}
+        for campo, row, col in campos:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=2, sticky="e")
+            
+            entry = ttk.Entry(form_frame, width=30)
+            entry.grid(row=row, column=col+1, padx=5, pady=2, sticky="w")
+            self.entries_fornecedor[campo] = entry
+        
+        self.fornecedor_id = ttk.Entry(form_frame)
+        self.fornecedor_id.grid(row=0, column=4)
+        self.fornecedor_id.grid_remove()
+        
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill="x", padx=10, pady=5)
+        
+        botoes = [
+            ("Novo", lambda: limpar_campos_fornecedor(self.entries_fornecedor, self.fornecedor_id)),
+            ("Salvar", lambda: salvar_fornecedor_gui(self.entries_fornecedor, self.fornecedor_id, self.tree_fornecedores, self.funcionario_logado_id)),
+            ("Excluir", lambda: excluir_fornecedor_gui(self.fornecedor_id, self.tree_fornecedores))
+        ]
+        
+        for i, (texto, cmd) in enumerate(botoes):
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)
+            btn.grid(row=0, column=i, padx=5)
+        
+        table_frame = ttk.Frame(frame)
+        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        cols = ["ID", "Nome", "CNPJ", "Telefone", "E-mail", "Website", "Endereço"]
+        self.tree_fornecedores = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
+        
+        for col in cols:
+            self.tree_fornecedores.heading(col, text=col)
+            self.tree_fornecedores.column(col, width=100)
+        
+        scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_fornecedores.yview)
+        scroll.pack(side="right", fill="y")
+        self.tree_fornecedores.configure(yscrollcommand=scroll.set)
+        
+        self.tree_fornecedores.pack(fill="both", expand=True)
+        carregar_fornecedores_na_tabela(self.tree_fornecedores)
+        self.tree_fornecedores.bind("<ButtonRelease-1>", self.selecionar_fornecedor)
+    
+    def criar_aba_funcionarios(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="Funcionários")
+        
+        form_frame = ttk.LabelFrame(frame, text="Dados do Funcionário", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)
+        
+        campos_principais = [
+            ("Nome", 0, 0), ("Cargo", 0, 2),
+            ("Telefone", 1, 0), ("E-mail", 1, 2),
+            ("Usuário", 2, 0), ("Senha", 2, 2),
+            ("Permissão", 3, 0), ("Situação", 3, 2),
+            ("Data Admissão", 4, 0)
+        ]
+        
+        campos_endereco = [
+            ("Rua", 5, 0), ("Número", 5, 2),
+            ("Bairro", 6, 0), ("Cidade", 6, 2),
+            ("Estado", 7, 0), ("CEP", 7, 2)
+        ]
+        
+        self.entries_funcionario = {}
+        for campo, row, col in campos_principais:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=2, sticky="e")
+            
+            if campo == "Senha":
+                entry = ttk.Entry(form_frame, width=30, show="*")
+            elif campo in ["Permissão", "Situação"]:
+                entry = ttk.Combobox(form_frame, width=27, values=["admin", "usuario"] if campo == "Permissão" else ["ativo", "inativo"])
+            else:
+                entry = ttk.Entry(form_frame, width=30)
+            
+            entry.grid(row=row, column=col+1, padx=5, pady=2, sticky="w")
+            self.entries_funcionario[campo] = entry
+        
+        self.entries_endereco_funcionario = {}
+        for campo, row, col in campos_endereco:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=2, sticky="e")
+            
+            entry = ttk.Entry(form_frame, width=30)
+            entry.grid(row=row, column=col+1, padx=5, pady=2, sticky="w")
+            self.entries_endereco_funcionario[campo] = entry
+        
+        self.funcionario_id = ttk.Entry(form_frame)
+        self.funcionario_id.grid(row=0, column=4)
+        self.funcionario_id.grid_remove()
+        
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill="x", padx=10, pady=5)
+        
+        botoes = [
+            ("Novo", lambda: limpar_campos_funcionario(self.entries_funcionario, self.funcionario_id)),
+            ("Salvar", lambda: salvar_funcionario_gui(self.entries_funcionario, self.funcionario_id, self.tree_funcionarios)),
+            ("Excluir", lambda: excluir_funcionario_gui(self.funcionario_id, self.tree_funcionarios))
+        ]
+        
+        for i, (texto, cmd) in enumerate(botoes):
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)
+            btn.grid(row=0, column=i, padx=5)
+        
+        table_frame = ttk.Frame(frame)
+        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        cols = ["ID", "Nome", "Cargo", "Telefone", "E-mail", "Usuário", "Senha", "Permissão", "Situação", "Admissão"]
+        self.tree_funcionarios = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
+        
+        for col in cols:
+            self.tree_funcionarios.heading(col, text=col)
+            self.tree_funcionarios.column(col, width=100)
+        
+        scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_funcionarios.yview)
+        scroll.pack(side="right", fill="y")
+        self.tree_funcionarios.configure(yscrollcommand=scroll.set)
+        
+        self.tree_funcionarios.pack(fill="both", expand=True)
+        carregar_funcionarios_na_tabela(self.tree_funcionarios)
+        self.tree_funcionarios.bind("<ButtonRelease-1>", self.selecionar_funcionario)
+    
+    def selecionar_injetora(self, event):
+        item = self.tree_injetoras.selection()
+        if item:
+            id_inj = self.tree_injetoras.item(item[0])["values"][0]
+            preencher_campos_injetora(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id, id_inj, self.fornecedores_disponiveis)
+    
+    def selecionar_fornecedor(self, event):
+        """Preenche os campos quando seleciona um fornecedor na tabela"""
+        try:
+            item = self.tree_fornecedores.selection()
+            if item:
+                # Obtém todos os valores da linha selecionada
+                valores = self.tree_fornecedores.item(item[0])["values"]
+                
+                # O ID deve ser o primeiro valor (índice 0)
+                id_forn = valores[0] if valores else None
+                
+                if id_forn:
+                    # Chama a função com TODOS os parâmetros necessários
+                    preencher_campos_fornecedor(
+                    self.entries_fornecedor,  # Todos os campos (incluindo endereço)
+                    None,                     # Placeholder para endereco_entries
+                    self.fornecedor_id,
+                    int(id_forn)
+                )
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao selecionar fornecedor: {str(e)}")
 
-    def on_table_select_injetora(self, event):
-        selected_item = self.injetora_table.selection()
-        if selected_item:
-            item_values = self.injetora_table.item(selected_item[0])['values']
-            
-            # Limpar todos os campos primeiro
-            clear_injetora_entries(self)
-            
-            # Preencher os campos com os valores da linha selecionada
-            if len(item_values) >= 11:  # Verifica se há valores suficientes
-                self.id_maquinas_entry.insert(0, item_values[0])
-                self.quantidade_entry.insert(0, item_values[1])
-                self.marca_entry.insert(0, item_values[2])
-                self.modelo_entry.insert(0, item_values[3])
-                self.capacidade_entry.insert(0, item_values[4])
-                self.forca_fechar_entry.insert(0, item_values[5])
-                self.tipo_controle_entry.insert(0, item_values[6])
-                self.preco_usd_entry.insert(0, item_values[7])
-                self.preco_brl_entry.insert(0, item_values[8])
-                self.fornecedor_injetora_entry.insert(0, item_values[9])
-                self.observacao_entry.insert(0, item_values[10])
 
-    def on_table_select_fornecedor(self, event):
-        selected_item = self.fornecedor_table.selection()
-        if selected_item:
-            item_values = self.fornecedor_table.item(selected_item[0])['values']
-            
-            # Limpar todos os campos primeiro
-            clear_fornecedor_entries(self)
-            
-            # Preencher os campos com os valores da linha selecionada
-            if len(item_values) >= 8:  # Verifica se há valores suficientes
-                self.id_fornecedor_entry.insert(0, item_values[0])
-                self.nome_fornecedor_entry.insert(0, item_values[1])
-                self.cnpj_entry.insert(0, item_values[2])
-                self.email_fornecedor_entry.insert(0, item_values[3])
-                self.endereco_entry.insert(0, item_values[4])
-                self.telefone_fornecedor_entry.insert(0, item_values[5])
-                self.contato_principal_entry.insert(0, item_values[6])
-                self.website_entry.insert(0, item_values[7])
-
-    def on_table_select_funcionario(self, event):
-        selected_item = self.funcionario_table.selection()
-        if selected_item:
-            item_values = self.funcionario_table.item(selected_item[0])['values']
-            
-            # Limpar todos os campos primeiro
-            clear_funcionario_entries(self)
-            
-            # Preencher os campos com os valores da linha selecionada
-            if len(item_values) >= 10:  # Verifica se há valores suficientes
-                self.id_funcionario_entry.insert(0, item_values[0])
-                self.nome_funcionario_entry.insert(0, item_values[1])
-                self.cargo_entry.insert(0, item_values[2])
-                self.telefone_funcionario_entry.insert(0, item_values[3])
-                self.email_funcionario_entry.insert(0, item_values[4])
-                self.data_admissao_entry.insert(0, item_values[5])
-                self.situacao_entry.insert(0, item_values[6])
-                self.permissao_entry.insert(0, item_values[7])
-                self.usuario_entry.insert(0, item_values[8])
-                self.senha_entry.insert(0, item_values[9])
+    def selecionar_funcionario(self, event):
+        item = self.tree_funcionarios.selection()
+        if item:
+            id_func = self.tree_funcionarios.item(item[0])["values"][0]
+            preencher_campos_funcionario(self.entries_funcionario, self.funcionario_id, id_func)
+    
+    def carregar_fornecedores_combobox(self):
+        fornecedores = listar_fornecedores()
+        self.fornecedores_disponiveis = {f['ID_Fornecedor']: f['NM_Fornecedor'] for f in fornecedores}
+        nomes_fornecedores = [f"{f['NM_Fornecedor']} (ID: {f['ID_Fornecedor']})" for f in fornecedores]
+        self.fornecedor_cb_injetora["values"] = nomes_fornecedores
