@@ -8,7 +8,7 @@ def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
     # Obter ID do fornecedor selecionado
     nome_fornecedor = fornecedor_cb.get()
     cursor.execute("SELECT ID_Fornecedor FROM Fornecedor WHERE NM_Fornecedor = %s", (nome_fornecedor,))
-    id_fornecedor = cursor.fetchone()[0]
+    id_fornecedor = cursor.fetchone()
     
     # Inserir nova injetora
     query = """
