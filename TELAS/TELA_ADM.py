@@ -250,3 +250,5 @@ class TELA_ADM:
         if item:
             id_func = self.tree_funcionarios.item(item[0])["values"][0]
             UPD_CAMPOS_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, id_func)
+    def SAIR(self):
+        self.root.deiconify()

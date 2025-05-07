@@ -46,28 +46,24 @@ class TELA_LOGIN:
             messagebox.showwarning("Aviso", "Preencha todos os campos!")
             return
 
-        try:
-            conn = get_connection()
-            cursor = conn.cursor()
+        conn = get_connection()
+        cursor = conn.cursor()
 
-            cursor.execute("""
-                SELECT id_funcionario, permissao 
-                FROM funcionario 
-                WHERE usuario = %s AND senha = %s AND situacao = 'ativo'
-            """, (usuario, senha))
-            resultado = cursor.fetchone()
-            
-            cursor.close()
-            conn.close()
+        cursor.execute("""
+            SELECT id_funcionario, permissao 
+            FROM funcionario 
+            WHERE usuario = %s AND senha = %s AND situacao = 'ativo'
+        """, (usuario, senha))
+        resultado = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
 
-            if resultado:
-                id_funcionario, permissao = resultado
-                self.ABRIR_TELA_PRINCIPAL(permissao, id_funcionario)
-            else:
-                messagebox.showerror("Erro", "Usuário ou senha incorretos ou funcionário inativo!")
-
-        except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao conectar com o banco de dados:\n{e}")
+        if resultado:
+            id_funcionario, permissao = resultado
+            self.ABRIR_TELA_PRINCIPAL(permissao, id_funcionario)
+        else:
+            messagebox.showerror("Erro", "Usuário ou senha incorretos ou funcionário inativo!")
 
     def ABRIR_TELA_PRINCIPAL(self, permissao, id_funcionario):
         main_window = tk.Toplevel()
