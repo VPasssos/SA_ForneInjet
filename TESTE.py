@@ -8,7 +8,6 @@ class TabelaSimples:
         self.root.geometry("900x650")
         
         self.contador_id = 1
-        self.mostrar_telefones = False  # Controla se os telefones são exibidos ou ocultos
         self.criar_widgets()
     
     def criar_widgets(self):
@@ -29,11 +28,8 @@ class TabelaSimples:
             lbl = ttk.Label(form_frame, text=f"{campo}:")
             lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
             
-            if campo == "Telefone":
-                entry = ttk.Entry(form_frame, width=30, show="*" if not self.mostrar_telefones else "")
-                entry.bind("<KeyRelease>", self.formatar_telefone)
-            else:
-                entry = ttk.Entry(form_frame, width=30)
+
+            entry = ttk.Entry(form_frame, width=30)
             
             entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
             self.entries[campo] = entry
@@ -48,7 +44,7 @@ class TabelaSimples:
             ("Editar", self.editar_item),
             ("Remover", self.remover_item),
             ("Limpar", self.limpar_campos),
-            ("Mostrar Telefones", self.toggle_telefones)
+            ("Filtrar", self.filtrar_itens),
         ]
         
         for i, (texto, cmd) in enumerate(botoes):
@@ -117,45 +113,7 @@ class TabelaSimples:
         # Atualiza o valor real
         entry.delete(0, tk.END)
         entry.insert(0, telefone_formatado)
-    
-    def toggle_telefones(self):
-        """Alterna entre mostrar e ocultar os números de telefone"""
-        self.mostrar_telefones = not self.mostrar_telefones
-        
-        # Atualiza o campo de entrada de telefone
-        self.entries["Telefone"].config(show="" if self.mostrar_telefones else "*")
-        
-        # Atualiza o texto atual no campo de telefone
-        current_text = self.entries["Telefone"].get()
-        if current_text:
-            if self.mostrar_telefones:
-                # Mostra o texto real (já está formatado)
-                pass
-            else:
-                # Oculta com asteriscos
-                self.entries["Telefone"].delete(0, tk.END)
-                self.entries["Telefone"].insert(0, "*" * len(current_text))
-        
-        # Atualiza todos os telefones na tabela
-        for child in self.tree.get_children(""):
-            valores = list(self.tree.item(child)["values"])
-            telefone = valores[1]
-            
-            if self.mostrar_telefones:
-                # Mostra o telefone real
-                valores[1] = telefone
-            else:
-                # Oculta o telefone com asteriscos
-                valores[1] = "*" * len(telefone) if telefone else ""
-            
-            self.tree.item(child, values=valores)
-        
-        # Atualiza o texto do botão
-        for widget in self.root.winfo_children():
-            if isinstance(widget, ttk.Button) and "Telefones" in widget.cget("text"):
-                widget.config(text="Ocultar Telefones" if self.mostrar_telefones else "Mostrar Telefones")
-                break
-    
+
     def carregar_dados_exemplo(self):
         dados = [
             ("João Silva", "(11) 9999-8888", "joao@email.com", "São Paulo"),
@@ -164,10 +122,6 @@ class TabelaSimples:
         ]
         
         for dado in dados:
-            # Oculta os telefones inicialmente se necessário
-            if not self.mostrar_telefones:
-                dado = list(dado)
-                dado[1] = "*" * len(dado[1])
             self.tree.insert("", tk.END, values=dado)
             self.contador_id += 1
     
@@ -231,20 +185,15 @@ class TabelaSimples:
                 
                 if campo == "Telefone":
                     # Mostra asteriscos ou o valor real conforme a configuração
-                    if not self.mostrar_telefones:
-                        self.entries[campo].config(show="*")
-                        self.entries[campo].insert(0, "*" * len(valores[i]) if i < len(valores) else "")
-                    else:
-                        self.entries[campo].config(show="")
-                        self.entries[campo].insert(0, valores[i] if i < len(valores) else "")
+                    self.entries[campo].config(show="")
+                    self.entries[campo].insert(0, valores[i] if i < len(valores) else "")
                 else:
                     self.entries[campo].insert(0, valores[i] if i < len(valores) else "")
     
     def limpar_campos(self):
         for entry in self.entries.values():
             entry.delete(0, tk.END)
-        # Restaura a máscara do telefone conforme a configuração atual
-        self.entries["Telefone"].config(show="" if self.mostrar_telefones else "*")
+
     
     def ordenar_por(self, col):
         """Ordena os itens da tabela pela coluna especificada"""
@@ -258,16 +207,21 @@ class TabelaSimples:
         """Filtra os itens da tabela conforme o texto digitado"""
         termo = self.search_entry.get().lower()
         
+        # Mostra todos os itens se o termo estiver vazio
+        if not termo:
+            for child in self.tree.get_children(""):
+                self.tree.reattach(child, "", "end")
+            return
+        
+        # Filtra os itens
         for child in self.tree.get_children(""):
             valores = self.tree.item(child)["values"]
             texto = " ".join(str(v) for v in valores).lower()
             if termo in texto:
-                self.tree.item(child, tags=("mostrar",))
-                self.tree.detach(child)
                 self.tree.reattach(child, "", "end")
             else:
                 self.tree.detach(child)
-
+        
 if __name__ == "__main__":
     root = tk.Tk()
     app = TabelaSimples(root)
