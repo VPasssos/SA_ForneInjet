@@ -75,7 +75,10 @@ class TELA_LOGIN:
         else:
             TELA_USER(main_window, id_funcionario)
             self.root.withdraw()
-        main_window.protocol("WM_DELETE_WINDOW", self.fechar_aplicacao)
-
-    def fechar_aplicacao(self):
+        main_window.protocol("WM_DELETE_WINDOW", self.VOLTAR_LOGIN)
+    
+    def VOLTAR_LOGIN(self):
         self.root.destroy()
+        novo_root = tk.Tk()
+        TELA_LOGIN(novo_root)
+        novo_root.mainloop()
