@@ -2,6 +2,7 @@ from tkinter import ttk
 from CRUDS.CRUD_INJETORA import *
 from CRUDS.CRUD_FORNECEDOR import *
 from CRUDS.CRUD_FUNCIONARIO import *
+from CRUDS.CRUD_CLIENTE import *
 class TELA_ADM:
     def __init__(self, root, id_funcionario):
         self.root = root
@@ -18,7 +19,8 @@ class TELA_ADM:
         self.ABA_INJETORAS()
         self.ABA_FORNECEDORES()
         self.ABA_FUNCIONARIOS()
-
+        self.ABA_CLIENTE()
+        
     def ABA_INJETORAS(self):
         frame = ttk.Frame(self.notebook)
         self.notebook.add(frame, text="INJETORA")
@@ -64,6 +66,16 @@ class TELA_ADM:
         table_frame = ttk.Frame(frame)
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
+        search_frame = ttk.Frame(table_frame)
+        search_frame.pack(fill="x", pady=(0, 10))
+
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search.pack(side="left", padx=(0, 5))
+
+        self.search_entry_injetora = ttk.Entry(search_frame, width=30)
+        self.search_entry_injetora.pack(side="left", fill="x", expand=True)
+        self.search_entry_injetora.bind("<KeyRelease>", self.filtrar_itens_injetoras)
+
         cols = ["ID","Marca", "Modelo", "Tipo", "Capacidade", "Força", "Preço USD", "Preço BRL", "Qtd", "Fornecedor","Observações"]
         self.tree_injetoras = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
@@ -86,6 +98,25 @@ class TELA_ADM:
         self.tree_injetoras.pack(fill="both", expand=True)
         UPD_TABELA_IJETORA(self.tree_injetoras)
         self.tree_injetoras.bind("<ButtonRelease-1>", self.SELECIONAR_INJETORA)
+
+    def filtrar_itens_injetoras(self, event=None):
+        termo = self.search_entry_injetora.get().lower()
+
+        if termo == "":
+            UPD_TABELA_IJETORA(self.tree_injetoras)
+        else: 
+            if not termo:
+                for child in self.tree_injetoras.get_children(""):
+                    self.tree_injetoras.reattach(child, "", "end")
+                return
+            
+            for child in self.tree_injetoras.get_children(""):
+                valores = self.tree_injetoras.item(child)["values"]
+                texto = " ".join(str(v) for v in valores).lower()
+                if termo in texto:
+                    self.tree_injetoras.reattach(child, "", "end")
+                else:
+                    self.tree_injetoras.detach(child)
 
     def SELECIONAR_INJETORA(self, event):
         item = self.tree_injetoras.selection()
@@ -140,6 +171,16 @@ class TELA_ADM:
         table_frame = ttk.Frame(frame)
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
+        search_frame = ttk.Frame(table_frame)
+        search_frame.pack(fill="x", pady=(0, 10))
+
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search.pack(side="left", padx=(0, 5))
+
+        self.search_entry_fornecedor = ttk.Entry(search_frame, width=30)
+        self.search_entry_fornecedor.pack(side="left", fill="x", expand=True)
+        self.search_entry_fornecedor.bind("<KeyRelease>", self.filtrar_itens_fornecedor)
+
         cols = ["ID","Nome", "CNPJ", "Telefone", "E-mail", "Website", "Endereço"]
         self.tree_fornecedor = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
@@ -163,11 +204,134 @@ class TELA_ADM:
         UPD_TABELA_FORNECEDOR(self.tree_fornecedor)
         self.tree_fornecedor.bind("<ButtonRelease-1>", self.SELECIONAR_FORNECEDOR)
 
+    def filtrar_itens_fornecedor(self, event=None):
+        termo = self.search_entry_fornecedor.get().lower()
+
+        if termo == "":
+            UPD_TABELA_FORNECEDOR(self.tree_fornecedor)
+        else: 
+            if not termo:
+                for child in self.tree_fornecedor.get_children(""):
+                    self.tree_fornecedor.reattach(child, "", "end")
+                return
+            
+            for child in self.tree_fornecedor.get_children(""):
+                valores = self.tree_fornecedor.item(child)["values"]
+                texto = " ".join(str(v) for v in valores).lower()
+                if termo in texto:
+                    self.tree_fornecedor.reattach(child, "", "end")
+                else:
+                    self.tree_fornecedor.detach(child)
+
     def SELECIONAR_FORNECEDOR(self, event):
         item = self.tree_fornecedor.selection()
         if item:
             id_for = self.tree_fornecedor.item(item[0])["values"][0]
             UPD_CAMPOS_FORNECEDOR(self.entries_fornecedor, self.fornecedor_id, id_for)   
+
+    def ABA_CLIENTE(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="CLIENTE")
+        form_frame = ttk.LabelFrame(frame, text="Dados da Cliente", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)
+
+        campos = [
+            ("Nome", 0, 0), ("CNPJ", 0, 2),
+            ("Telefone", 1, 0), ("E-mail", 1, 2),
+            ("Rua", 2, 0), ("Número", 2, 2),
+            ("Bairro", 3, 0), ("Cidade", 3, 2),
+            ("Estado", 4, 0), ("CEP", 4, 2)
+        ]
+        
+        self.entries_cliente = {}
+        for campo, row, col in campos:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
+            
+            if campo == "Cliente":
+                entry = ttk.Combobox(form_frame, width=30)
+                self.cliente_cb_cliente = entry
+            else:
+                entry = ttk.Entry(form_frame, width=30)
+            
+            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
+            self.entries_cliente[campo] = entry
+        self.cliente_id = ttk.Entry(form_frame)
+        self.cliente_id.grid(row=0, column=4)
+        self.cliente_id.grid_remove()
+
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill="x", padx=10, pady=5)
+
+        botoes = [
+            ("Novo", lambda: ADD_CLIENTE(self.entries_cliente, self.tree_cliente)),
+            ("Salvar", lambda: UPD_CLIENTE(self.entries_cliente, self.cliente_id, self.tree_cliente, self.funcionario_logado_id)),
+            ("Excluir", lambda: DEL_CLIENTE(self.cliente_id, self.tree_cliente))
+        ]
+        for i, (texto, cmd) in enumerate(botoes):
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)
+            btn.grid(row=0, column=i, padx=5)
+
+        table_frame = ttk.Frame(frame)
+        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        search_frame = ttk.Frame(table_frame)
+        search_frame.pack(fill="x", pady=(0, 10))
+
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search.pack(side="left", padx=(0, 5))
+
+        self.search_entry_cliente = ttk.Entry(search_frame, width=30)
+        self.search_entry_cliente.pack(side="left", fill="x", expand=True)
+        self.search_entry_cliente.bind("<KeyRelease>", self.filtrar_itens_cliente)
+
+        cols = ["ID","Nome", "CNPJ", "Telefone", "E-mail", "Website", "Endereço"]
+        self.tree_cliente = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
+
+        for col in cols:
+            width = 100  # Largura padrão
+            if col == "ID":
+                width = 50
+            elif col == "Endereço":
+                width = 180  # Largura maior para endereço completo
+            elif col == "CNPJ":
+                width = 120  # Largura maior para CNPJ
+                
+            self.tree_cliente.heading(col, text=col)
+            self.tree_cliente.column(col, width=width, anchor='w' if col == "Endereço" else 'center')
+        
+        scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_cliente.yview)
+        scroll.pack(side="right", fill="y")
+        self.tree_cliente.configure(yscrollcommand=scroll.set)
+        
+        self.tree_cliente.pack(fill="both", expand=True)
+        UPD_TABELA_CLIENTE(self.tree_cliente)
+        self.tree_cliente.bind("<ButtonRelease-1>", self.SELECIONAR_CLIENTE)
+
+    def filtrar_itens_cliente(self, event=None):
+        termo = self.search_entry_cliente.get().lower()
+
+        if termo == "":
+            UPD_TABELA_CLIENTE(self.tree_cliente)
+        else: 
+            if not termo:
+                for child in self.tree_cliente.get_children(""):
+                    self.tree_cliente.reattach(child, "", "end")
+                return
+            
+            for child in self.tree_cliente.get_children(""):
+                valores = self.tree_cliente.item(child)["values"]
+                texto = " ".join(str(v) for v in valores).lower()
+                if termo in texto:
+                    self.tree_cliente.reattach(child, "", "end")
+                else:
+                    self.tree_cliente.detach(child)
+
+    def SELECIONAR_CLIENTE(self, event):
+        item = self.tree_cliente.selection()
+        if item:
+            id_for = self.tree_cliente.item(item[0])["values"][0]
+            UPD_CAMPOS_CLIENTE(self.entries_cliente, self.cliente_id, id_for)   
 
     def ABA_FUNCIONARIOS(self):
         frame = ttk.Frame(self.notebook)
@@ -220,6 +384,16 @@ class TELA_ADM:
         table_frame = ttk.Frame(frame)
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
+        search_frame = ttk.Frame(table_frame)
+        search_frame.pack(fill="x", pady=(0, 10))
+
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search.pack(side="left", padx=(0, 5))
+
+        self.search_entry_funcionario = ttk.Entry(search_frame, width=30)
+        self.search_entry_funcionario.pack(side="left", fill="x", expand=True)
+        self.search_entry_funcionario.bind("<KeyRelease>", self.filtrar_itens_funcionario)
+
         cols = ["ID","Nome", "Cargo", "Telefone", "E-mail", "Usuário", "Senha", "Permissão", "Situação", "Admissão","Endereço"]
         self.tree_funcionarios = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
@@ -244,6 +418,25 @@ class TELA_ADM:
         self.tree_funcionarios.pack(fill="both", expand=True)
         UPD_TABELA_FUNCIONARIO(self.tree_funcionarios)
         self.tree_funcionarios.bind("<ButtonRelease-1>", self.SELECIONAR_FUNCIONARIO)
+
+    def filtrar_itens_funcionario(self, event=None):
+        termo = self.search_entry_funcionario.get().lower()
+
+        if termo == "":
+            UPD_TABELA_FUNCIONARIO(self.tree_funcionarios)
+        else: 
+            if not termo:
+                for child in self.tree_funcionarios.get_children(""):
+                    self.tree_funcionarios.reattach(child, "", "end")
+                return
+            
+            for child in self.tree_funcionarios.get_children(""):
+                valores = self.tree_funcionarios.item(child)["values"]
+                texto = " ".join(str(v) for v in valores).lower()
+                if termo in texto:
+                    self.tree_funcionarios.reattach(child, "", "end")
+                else:
+                    self.tree_funcionarios.detach(child)
 
     def SELECIONAR_FUNCIONARIO(self, event):
         item = self.tree_funcionarios.selection()

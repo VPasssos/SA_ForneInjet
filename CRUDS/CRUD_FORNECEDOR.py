@@ -153,7 +153,6 @@ def UPD_TABELA_FORNECEDOR(tree):
             forn["CNPJ"],
             forn["telefone"],
             forn["email"],
-            forn["website"],
             forn["endereco"]
         ))
         
