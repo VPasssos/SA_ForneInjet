@@ -2,7 +2,8 @@ from tkinter import ttk
 from datetime import datetime
 import tkinter as tk
 from CRUDS.CRUD_FUNCIONARIO import UPD_DADOS_FUNCIONARIOS
-from CRUDS.CRUD_VENDA import ADD_ITEM_VENDA, ADD_VENDA, GET_CLIENTES
+from CRUDS.CRUD_VENDA import *
+
 class TELA_USER:
     def __init__(self, root, id_funcionario):
         self.root = root
@@ -92,9 +93,12 @@ class TELA_USER:
         self.cb_cliente_venda["values"] = list(self.clientes_dict.keys())
 
     def carregar_injetoras(self):
-        injetoras = GET_INJETORAS()  # Você deve criar isso no CRUD_INJETORA
+        injetoras = GET_INJETORAS()
+        # Adapte o dicionário para ter a estrutura correta
         self.injetoras_dict = {f"{marca} {modelo} (ID:{id})": id for id, marca, modelo in injetoras}
         self.cb_injetora_venda["values"] = list(self.injetoras_dict.keys())
+
+
 
     def adicionar_item_venda(self):
         inj_nome = self.cb_injetora_venda.get()
