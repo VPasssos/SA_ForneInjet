@@ -1,11 +1,11 @@
 from tkinter import messagebox
-from CONFIG import  get_connection
+from CONFIG import get_connection
 
-def ADD_CLIENTE(entries,tree_Cliente):
+def ADD_CLIENTE(entries, tree_Cliente):
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Inserir Cliente
+    # Insert Client
     query = """
     INSERT INTO cliente (nome, cnpj, telefone, email, Cadastrado_por)
     VALUES (%s, %s, %s, %s, %s)
@@ -21,7 +21,7 @@ def ADD_CLIENTE(entries,tree_Cliente):
     cursor.execute(query, valores)
     ID_cliente = cursor.lastrowid
 
-    # Inserir endereço do Cliente
+    # Insert Client Address
     query_end = """
     INSERT INTO EnderecoCliente (ID_cliente, rua, numero, bairro, cidade, estado, cep)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -41,6 +41,7 @@ def ADD_CLIENTE(entries,tree_Cliente):
     
     messagebox.showinfo("Sucesso", "Cliente cadastrado com sucesso!")
     UPD_TABELA_CLIENTE(tree_Cliente)
+    
     cursor.close()
     conn.close()
 
@@ -61,6 +62,7 @@ def DEL_CLIENTE(ID_cliente, tree):
         conn.commit()
         messagebox.showinfo("Sucesso", "Cliente excluído com sucesso!")
         UPD_TABELA_CLIENTE(tree)
+        
         cursor.close()
         conn.close()
 
@@ -73,7 +75,7 @@ def UPD_CLIENTE(entries, ID_cliente, tree):
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Atualizar Cliente
+    # Update Client
     query = """
     UPDATE cliente SET 
         nome = %s,
@@ -93,7 +95,7 @@ def UPD_CLIENTE(entries, ID_cliente, tree):
     )
     cursor.execute(query, valores)
 
-    # Atualizar endereço
+    # Update Address
     query_end = """
     UPDATE EnderecoCliente SET 
         rua = %s,
@@ -119,6 +121,7 @@ def UPD_CLIENTE(entries, ID_cliente, tree):
     
     messagebox.showinfo("Sucesso", "Cliente atualizado com sucesso!")
     UPD_TABELA_CLIENTE(tree)
+    
     cursor.close()
     conn.close()
 
@@ -126,11 +129,11 @@ def UPD_TABELA_CLIENTE(tree):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     
-    # Limpar a treeview
+    # Clear the treeview
     for item in tree.get_children():
         tree.delete(item)
     
-    # Buscar clientes e endereço
+    # Fetch clients and addresses
     query = """
     SELECT c.*, 
            CONCAT(e.rua, ', ', e.numero, ', ', e.bairro, ', ', e.cidade, ', ', e.estado) as endereco
@@ -168,6 +171,7 @@ def UPD_CAMPOS_CLIENTE(entries, ID_cliente, ID_clie, Cliente):
     clie = cursor.fetchone()
     
     if clie:
+        # Populate UI fields with existing client data
         entries["Nome"].delete(0, "end")
         entries["Nome"].insert(0, clie["nome"])
 
