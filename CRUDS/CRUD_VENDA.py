@@ -1,93 +1,265 @@
+from tkinter import messagebox
 from CONFIG import get_connection
-from datetime import datetime
-# ======================
-# FUNÇÃO: GET_CLIENTES
-# ======================
-def GET_CLIENTES():
-    try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT ID_Cliente, nome FROM Cliente")
-        clientes = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return clientes
-    except Exception as e:
-        print(f"[ERRO - GET_CLIENTES] {e}")
-        return []
 
-# ======================
-# FUNÇÃO: GET_INJETORAS
-# ======================
-def GET_INJETORAS():
-    try:
+def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree_vendas, funcionario_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    
+    if hasattr(funcionario_id, 'get'):
+        funcionario_id = funcionario_id.get()
+    
+    # Obter ID do cliente selecionado
+    nome_cliente = cliente_cb.get()
+    cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
+    id_cliente = cursor.fetchone()
+
+    if not id_cliente:
+        messagebox.showwarning("Aviso", "Cliente não encontrado!")
+        return
+
+    # Obter ID do produto selecionado
+    nome_produto = produto_cb_venda.get()
+    cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
+    id_produto = cursor.fetchone()
+
+    if not id_produto:
+        messagebox.showwarning("Aviso", "Produto não encontrado!")
+        return
+
+    # Obter nome do funcionário cadastrante
+    cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
+    cadastrante = funcionario_id
+
+    # Inserir nova venda
+    query = """
+    INSERT INTO Venda (data_venda, valor_total_BRL, valor_total_USD, 
+                    status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    valores = (
+        entries["Data Venda"].get(),
+        float(entries["Preço Unitário (BRL)"].get()),
+        float(entries["Preço Unitário (USA)"].get()),
+        entries["Status Aprovação"].get(),
+        id_cliente[0],
+        funcionario_id,
+        entries["Observações"].get(),
+        entries["Forma Pagamento"].get() 
+    )
+
+    cursor.execute(query, valores)
+    id_venda = cursor.lastrowid  # Obtém o ID da venda recém-criada
+
+    # Inserir item da venda
+    query_item = """
+    INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, 
+                          preco_unitario_BRL, preco_unitario_USD)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    valores_item = (
+        id_venda,
+        id_produto[0],
+        int(entries["Quantidade"].get()),
+        float(entries["Preço Unitário (BRL)"].get()),
+        float(entries["Preço Unitário (USA)"].get())
+    )
+
+    cursor.execute(query_item, valores_item)
+    conn.commit()
+    messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
+    UPD_TABELA_VENDAS(tree_vendas)
+    cursor.close()
+    conn.close()
+
+def DEL_VENDA(venda_id, tree):
+    id_venda = venda_id.get()
+    if not id_venda:
+        messagebox.showwarning("Aviso", "Selecione uma venda para excluir!")
+        return
+
+    resposta = messagebox.askyesno("Confirmar", "Deseja realmente excluir esta venda?")
+    if resposta:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT ID_Injetora, marca, modelo FROM Injetora")
-        injetoras = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return injetoras
-    except Exception as e:
-        print(f"[ERRO - GET_INJETORAS] {e}")
-        return []
 
-
-# ======================
-# FUNÇÃO: ADD_VENDA
-# ======================
-def ADD_VENDA(ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, valor_total_USD, observacoes):
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        query = """
-            INSERT INTO Venda (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, valor_total_USD, observacoes)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-        valores = (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, valor_total_USD, observacoes)
-        cursor.execute(query, valores)
+        # Primeiro excluir os itens da venda
+        cursor.execute("DELETE FROM ItemVenda WHERE ID_Venda = %s", (id_venda,))
+        # Depois excluir a venda
+        cursor.execute("DELETE FROM Venda WHERE ID_Venda = %s", (id_venda,))
         conn.commit()
-        venda_id = cursor.lastrowid
+
+        messagebox.showinfo("Sucesso", "Venda excluída com sucesso!")
+        UPD_TABELA_VENDAS(tree)
         cursor.close()
         conn.close()
-        return venda_id
-    except Exception as e:
-        print(f"[ERRO - ADD_VENDA] {e}")
-        return None
 
-# ======================
-# FUNÇÃO: ADD_ITEM_VENDA
-# ======================
-def ADD_ITEM_VENDA(ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL, preco_unitario_USD):
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        query = """
-            INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL, preco_unitario_USD)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        valores = (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL, preco_unitario_USD)
-        cursor.execute(query, valores)
+def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_id):
+    id_venda = venda_id.get()
+    if not id_venda:
+        messagebox.showwarning("Aviso", "Selecione uma venda para atualizar!")
+        return
 
-        # Atualiza o estoque da injetora
-        cursor.execute(
-            "UPDATE Injetora SET quantidade = quantidade - %s WHERE ID_Injetora = %s",
-            (quantidade, ID_Injetora)
-        )
+    conn = get_connection()
+    cursor = conn.cursor()
 
-        # Insere log de saída de estoque
-        cursor.execute(
-            """
-            INSERT INTO LogEstoque (ID_Injetora, tipo_movimento, quantidade, origem, id_origem, ID_Funcionario)
-            VALUES (%s, 'saida', %s, 'Venda', %s, %s)
-            """,
-            (ID_Injetora, quantidade, ID_Venda, 2)  # 2 como exemplo do funcionário responsável
-        )
+    # Obter ID do cliente selecionado
+    nome_cliente = cliente_cb.get()
+    cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
+    id_cliente = cursor.fetchone()[0]
 
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return True
-    except Exception as e:
-        print(f"[ERRO - ADD_ITEM_VENDA] {e}")
-        return False
+    # Obter nome do produto selecionado
+    nome_produto = entries["Produto"].get()
+    cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
+    id_produto = cursor.fetchone()[0]
+
+    # Obter nome do funcionário cadastrante
+    cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
+    cadastrante = funcionario_id
+
+    # Atualizar venda
+    query = """
+    UPDATE Venda SET 
+        data_venda = %s,
+        valor_total_BRL = %s,
+        valor_total_USD = %s,
+        status_aprovacao = %s,
+        ID_Cliente = %s,
+        observacoes = %s,
+        forma_pagamento = %s
+    WHERE ID_Venda = %s
+    """
+    valores = (
+        entries["Data Venda"].get(),
+        float(entries["Preço Unitário (BRL)"].get()),
+        float(entries["Preço Unitário (USA)"].get()),
+        entries["Status Aprovação"].get(),
+        id_cliente,
+        entries["Observações"].get(),
+        entries["Forma Pagamento"].get(),  # Novo campo adicionado
+        id_venda
+    )
+    cursor.execute(query, valores)
+    
+    # Atualizar item da venda
+    query_item = """
+    UPDATE ItemVenda SET 
+        ID_Injetora = %s,
+        quantidade = %s,
+        preco_unitario_BRL = %s,
+        preco_unitario_USD = %s
+    WHERE ID_Venda = %s
+    """
+    valores_item = (
+        id_produto,
+        int(entries["Quantidade"].get()),
+        float(entries["Preço Unitário (BRL)"].get()),
+        float(entries["Preço Unitário (USA)"].get()),
+        id_venda
+    )
+
+    cursor.execute(query_item, valores_item)
+    conn.commit()
+    messagebox.showinfo("Sucesso", "Venda atualizada com sucesso!")
+    UPD_TABELA_VENDAS(tree)
+    cursor.close()
+    conn.close()
+
+def UPD_TABELA_VENDAS(tree):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Limpar a treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Buscar vendas com informações completas
+    query = """
+    SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
+        iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+        v.data_venda, v.status_aprovacao, f.nome AS cadastrante, 
+        v.observacoes, v.forma_pagamento
+    FROM Venda v
+    JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
+    JOIN ItemVenda iv ON v.ID_Venda = iv.ID_Venda
+    JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
+    JOIN Funcionario f ON v.ID_Funcionario = f.ID_Funcionario
+    ORDER BY v.data_venda DESC
+    """
+    cursor.execute(query)
+    vendas = cursor.fetchall()
+
+    # Preencher a treeview
+    for venda in vendas:
+        tree.insert("", "end", values=(
+            venda["ID_Venda"],
+            venda["cliente"],
+            venda["produto"],
+            venda["quantidade"],
+            venda["preco_unitario_BRL"],
+            venda["preco_unitario_USD"],
+            venda["data_venda"],
+            venda["status_aprovacao"],
+            venda["cadastrante"],
+            venda["observacoes"]
+        ))
+
+    cursor.close()
+    conn.close()
+
+def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Buscar dados completos da venda
+    query = """
+    SELECT v.*, c.nome AS cliente, i.modelo AS produto, 
+           iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+           f.nome AS cadastrante
+    FROM Venda v
+    JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
+    JOIN ItemVenda iv ON v.ID_Venda = iv.ID_Venda
+    JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
+    JOIN Funcionario f ON v.ID_Funcionario = f.ID_Funcionario
+    WHERE v.ID_Venda = %s
+    """
+    cursor.execute(query, (id_venda,))
+    venda = cursor.fetchone()
+
+    if venda:
+        # Preencher os campos
+        entries["Data Venda"].delete(0, "end")
+        entries["Data Venda"].insert(0, venda["data_venda"])
+
+        entries["Forma Pagamento"].delete(0, "end")
+        entries["Forma Pagamento"].insert(0, venda["forma_pagamento"])
+
+        entries["Preço Unitário (BRL)"].delete(0, "end")
+        entries["Preço Unitário (BRL)"].insert(0, str(venda["preco_unitario_BRL"]))
+
+        entries["Preço Unitário (USA)"].delete(0, "end")
+        entries["Preço Unitário (USA)"].insert(0, str(venda["preco_unitario_USD"]))
+
+        entries["Quantidade"].delete(0, "end")
+        entries["Quantidade"].insert(0, str(venda["quantidade"]))
+
+        entries["Status Aprovação"].delete(0, "end")
+        entries["Status Aprovação"].insert(0, venda["status_aprovacao"])
+
+        entries["Cadastrante"].delete(0, "end")
+        entries["Cadastrante"].insert(0, venda["cadastrante"])
+
+        entries["Observações"].delete(0, "end")
+        entries["Observações"].insert(0, venda["observacoes"])
+
+        # Configurar os comboboxes
+        cliente_cb.set(venda["cliente"])
+        entries["Produto"].delete(0, "end")
+        entries["Produto"].insert(0, venda["produto"])
+
+        # Atualizar o ID da venda
+        venda_id.delete(0, "end")
+        venda_id.insert(0, str(venda["ID_Venda"]))
+
+    cursor.close()
+    conn.close()

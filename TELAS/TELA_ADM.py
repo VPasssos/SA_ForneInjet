@@ -3,6 +3,7 @@ from CRUDS.CRUD_INJETORA import *
 from CRUDS.CRUD_FORNECEDOR import *
 from CRUDS.CRUD_FUNCIONARIO import *
 from CRUDS.CRUD_CLIENTE import *
+from CRUDS.CRUD_VENDA import *
 class TELA_ADM:
     def __init__(self, root, id_funcionario):
         self.root = root
@@ -16,10 +17,11 @@ class TELA_ADM:
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True)
         
+        self.ABA_VENDA()
+        # self.ABA_CLIENTE()
         self.ABA_INJETORAS()
         self.ABA_FORNECEDORES()
         self.ABA_FUNCIONARIOS()
-        self.ABA_CLIENTE()
         
     def ABA_INJETORAS(self):
         frame = ttk.Frame(self.notebook)
@@ -443,3 +445,118 @@ class TELA_ADM:
         if item:
             id_func = self.tree_funcionarios.item(item[0])["values"][0]
             UPD_CAMPOS_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, id_func)
+
+    def ABA_VENDA(self):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text="VENDAS")
+        
+
+        form_frame = ttk.LabelFrame(frame, text="Dados da Venda", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)
+
+        campos = [
+            ("Cliente", 0, 0), ("Produto", 0, 2),
+            ("Quantidade", 1, 0), ("Cadastrante", 1, 2),
+            ("Preço Unitário (BRL)", 2, 0), ("Preço Unitário (USA)", 2, 2),
+            ("Data Venda", 3, 0), ("Forma Pagamento", 3, 2),
+            ("Status Aprovação", 4, 0), ("Observações", 4, 2)
+        ]
+        
+        self.entries_venda = {}
+        for campo, row, col in campos:
+            lbl = ttk.Label(form_frame, text=f"{campo}:")
+            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
+            
+         
+            if campo == "Cliente":
+                entry = ttk.Combobox(form_frame, width=30) 
+                self.cliente_cb_venda = entry
+            elif campo == "Produto":
+                entry = ttk.Combobox(form_frame, width=30) 
+                self.produto_cb_venda = entry
+            elif campo == "Data da Venda":
+                entry = ttk.Entry(form_frame, width=30)  
+            else:
+                entry = ttk.Entry(form_frame, width=30)
+            
+            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
+            self.entries_venda[campo] = entry
+
+        self.venda_id = ttk.Entry(form_frame)  
+        self.venda_id.grid(row=0, column=4)
+        self.venda_id.grid_remove()
+
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill="x", padx=10, pady=5)
+        botoes = [
+            ("Novo", lambda: ADD_VENDA(self.entries_venda, self.cliente_cb_venda, self.produto_cb_venda, self.tree_vendas, self.funcionario_id)),
+            ("Salvar", lambda: UPD_VENDA(self.entries_venda, self.cliente_cb_venda, self.venda_id, self.tree_vendas, self.funcionario_id)),
+            ("Excluir", lambda: DEL_VENDA(self.venda_id, self.tree_vendas))
+        ]
+        for i, (texto, cmd) in enumerate(botoes):
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)
+            btn.grid(row=0, column=i, padx=5)
+
+        # Create a frame for the sales table
+        table_frame = ttk.Frame(frame)
+        table_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        search_frame = ttk.Frame(table_frame)
+        search_frame.pack(fill="x", pady=(0, 10))
+
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search.pack(side="left", padx=(0, 5))
+
+        self.search_entry_venda = ttk.Entry(search_frame, width=30)
+        self.search_entry_venda.pack(side="left", fill="x", expand=True)
+        self.search_entry_venda.bind("<KeyRelease>", self.filtrar_itens_vendas)
+
+        # Define the columns for the sales table
+        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
+        self.tree_vendas = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
+
+        for col in cols:
+            width = 100  # Default width
+            if col == "ID":
+                width = 50  # Smaller width for ID
+            elif col == "Observações":
+                width = 150  # Wider width for observations
+            elif col == "Data da Venda":
+                width = 120  # Specific width for date
+
+            self.tree_vendas.heading(col, text=col)
+            self.tree_vendas.column(col, width=width, anchor='w' if col == "Observações" else 'center')
+
+        # Add a scrollbar for the treeview
+        scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_vendas.yview)
+        scroll.pack(side="right", fill="y")
+        self.tree_vendas.configure(yscrollcommand=scroll.set)
+
+        self.tree_vendas.pack(fill="both", expand=True)
+        UPD_TABELA_VENDAS(self.tree_vendas)
+        self.tree_vendas.bind("<ButtonRelease-1>", self.SELECIONAR_VENDA)
+
+    def filtrar_itens_vendas(self, event=None):
+        termo = self.search_entry_venda.get().lower()
+
+        if termo == "":
+            UPD_TABELA_VENDAS(self.tree_vendas)
+        else:
+            if not termo:
+                for child in self.tree_vendas.get_children(""):  # Reset view
+                    self.tree_vendas.reattach(child, "", "end")
+                return
+
+            for child in self.tree_vendas.get_children(""):  # Filter sales based on search term
+                valores = self.tree_vendas.item(child)["values"]
+                texto = " ".join(str(v) for v in valores).lower()
+                if termo in texto:
+                    self.tree_vendas.reattach(child, "", "end")
+                else:
+                    self.tree_vendas.detach(child)
+
+    def SELECIONAR_VENDA(self, event):
+        item = self.tree_vendas.selection()
+        if item:
+            id_venda = self.tree_vendas.item(item[0])["values"][0]
+            UPD_CAMPOS_VENDA(self.entries_venda, self.cliente_cb_venda, self.venda_id, id_venda)
