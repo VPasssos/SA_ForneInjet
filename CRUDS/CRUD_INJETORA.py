@@ -3,7 +3,7 @@ from CONFIG import get_connection
 
 def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
     conn = get_connection()
-    cursor = conn.cursor() 
+    cursor = conn.cursor()
     
     # Obter ID do fornecedor selecionado
     nome_fornecedor = fornecedor_cb.get()

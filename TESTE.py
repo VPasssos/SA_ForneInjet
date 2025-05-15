@@ -1,274 +1,50 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
-class TabelaSimples:
+class AbasDinamicasApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Gerenciador de Contatos")
-        self.root.geometry("900x650")
-        
-        self.contador_id = 1
-        self.mostrar_telefones = False  # Controla se os telefones são exibidos ou ocultos
-        self.criar_widgets()
-    
-    def criar_widgets(self):
-        # Frame principal
-        main_frame = ttk.Frame(self.root)
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # Frame do formulário
-        form_frame = ttk.LabelFrame(main_frame, text="Cadastro de Contato", padding=10)
-        form_frame.pack(fill=tk.X, padx=5, pady=5)
-        
-        # Campos do formulário
-        campos = [("Nome", 0, 0), ("Telefone", 0, 2), 
-                 ("E-mail", 1, 0), ("Cidade", 1, 2)]
-        
-        self.entries = {}
-        for campo, row, col in campos:
-            lbl = ttk.Label(form_frame, text=f"{campo}:")
-            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
-            
-            if campo == "Telefone":
-                entry = ttk.Entry(form_frame, width=30, show="*" if not self.mostrar_telefones else "")
-                entry.bind("<KeyRelease>", self.formatar_telefone)
-            else:
-                entry = ttk.Entry(form_frame, width=30)
-            
-            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
-            self.entries[campo] = entry
-        
-        # Frame dos botões
-        btn_frame = ttk.Frame(main_frame)
-        btn_frame.pack(fill=tk.X, padx=5, pady=5)
-        
-        # Botões
-        botoes = [
-            ("Adicionar", self.adicionar_item),
-            ("Editar", self.editar_item),
-            ("Remover", self.remover_item),
-            ("Limpar", self.limpar_campos),
-            ("Mostrar Telefones", self.toggle_telefones)
-        ]
-        
-        for i, (texto, cmd) in enumerate(botoes):
-            btn = ttk.Button(btn_frame, text=texto, command=cmd)
-            btn.grid(row=0, column=i, padx=5, sticky="ew")
-            btn_frame.columnconfigure(i, weight=1)
-        
-        # Frame da tabela
-        table_frame = ttk.LabelFrame(main_frame, text="Lista de Contatos", padding=10)
-        table_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        # Barra de pesquisa
-        search_frame = ttk.Frame(table_frame)
-        search_frame.pack(fill=tk.X, pady=(0, 10))
-        
-        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
-        lbl_search.pack(side=tk.LEFT, padx=(0, 5))
-        
-        self.search_entry = ttk.Entry(search_frame, width=30)
-        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        self.search_entry.bind("<KeyRelease>", self.filtrar_itens)
-        
-        # Colunas da tabela
-        cols = ["Nome", "Telefone", "E-mail", "Cidade"]
-        self.tree = ttk.Treeview(
-            table_frame, 
-            columns=cols, 
-            show="headings", 
-            height=10,
-            selectmode="browse"
-        )
-        
-        # Configurar cabeçalhos e colunas
-        for col in cols:
-            self.tree.heading(col, text=col, command=lambda c=col: self.ordenar_por(col))
-            self.tree.column(col, width=180, anchor="w")
-        
-        # Barra de rolagem
-        scroll = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
-        scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tree.configure(yscrollcommand=scroll.set)
-        
-        self.tree.pack(fill=tk.BOTH, expand=True)
-        
-        # Vincular eventos
-        self.tree.bind("<<TreeviewSelect>>", self.selecionar_item)
-        
-        # Dados de exemplo
-        self.carregar_dados_exemplo()
-    
-    def formatar_telefone(self, event):
-        """Formata o número de telefone enquanto digita"""
-        entry = self.entries["Telefone"]
-        texto = entry.get()
-        
-        # Remove tudo que não for dígito
-        digitos = [c for c in texto if c.isdigit()]
-        telefone = "".join(digitos)
-        
-        # Formatação básica
-        if len(telefone) > 0:
-            telefone_formatado = f"({telefone[:2]}) {telefone[2:6]}-{telefone[6:10]}"
-        else:
-            telefone_formatado = ""
-        
-        # Atualiza o valor real
-        entry.delete(0, tk.END)
-        entry.insert(0, telefone_formatado)
-    
-    def toggle_telefones(self):
-        """Alterna entre mostrar e ocultar os números de telefone"""
-        self.mostrar_telefones = not self.mostrar_telefones
-        
-        # Atualiza o campo de entrada de telefone
-        self.entries["Telefone"].config(show="" if self.mostrar_telefones else "*")
-        
-        # Atualiza o texto atual no campo de telefone
-        current_text = self.entries["Telefone"].get()
-        if current_text:
-            if self.mostrar_telefones:
-                # Mostra o texto real (já está formatado)
-                pass
-            else:
-                # Oculta com asteriscos
-                self.entries["Telefone"].delete(0, tk.END)
-                self.entries["Telefone"].insert(0, "*" * len(current_text))
-        
-        # Atualiza todos os telefones na tabela
-        for child in self.tree.get_children(""):
-            valores = list(self.tree.item(child)["values"])
-            telefone = valores[1]
-            
-            if self.mostrar_telefones:
-                # Mostra o telefone real
-                valores[1] = telefone
-            else:
-                # Oculta o telefone com asteriscos
-                valores[1] = "*" * len(telefone) if telefone else ""
-            
-            self.tree.item(child, values=valores)
-        
-        # Atualiza o texto do botão
-        for widget in self.root.winfo_children():
-            if isinstance(widget, ttk.Button) and "Telefones" in widget.cget("text"):
-                widget.config(text="Ocultar Telefones" if self.mostrar_telefones else "Mostrar Telefones")
-                break
-    
-    def carregar_dados_exemplo(self):
-        dados = [
-            ("João Silva", "(11) 9999-8888", "joao@email.com", "São Paulo"),
-            ("Maria Souza", "(21) 7777-6666", "maria@email.com", "Rio de Janeiro"),
-            ("Carlos Oliveira", "(31) 5555-4444", "carlos@email.com", "Belo Horizonte")
-        ]
-        
-        for dado in dados:
-            # Oculta os telefones inicialmente se necessário
-            if not self.mostrar_telefones:
-                dado = list(dado)
-                dado[1] = "*" * len(dado[1])
-            self.tree.insert("", tk.END, values=dado)
-            self.contador_id += 1
-    
-    def validar_campos(self):
-        """Valida se os campos obrigatórios foram preenchidos"""
-        if not self.entries["Nome"].get().strip():
-            messagebox.showwarning("Aviso", "O campo Nome é obrigatório!")
-            return False
-        return True
-    
-    def adicionar_item(self):
-        if not self.validar_campos():
-            return
-            
-        valores = (
-            self.entries["Nome"].get().strip(),
-            self.entries["Telefone"].get().strip(),
-            self.entries["E-mail"].get().strip(),
-            self.entries["Cidade"].get().strip()
-        )
-        
-        self.tree.insert("", tk.END, values=valores)
-        self.contador_id += 1
-        self.limpar_campos()
-    
-    def editar_item(self):
-        item_selecionado = self.tree.selection()
-        if not item_selecionado:
-            messagebox.showwarning("Aviso", "Selecione um item para editar!")
-            return
-            
-        if not self.validar_campos():
-            return
-            
-        valores = (
-            self.entries["Nome"].get().strip(),
-            self.entries["Telefone"].get().strip(),
-            self.entries["E-mail"].get().strip(),
-            self.entries["Cidade"].get().strip()
-        )
-        
-        self.tree.item(item_selecionado, values=valores)
-        self.limpar_campos()
-    
-    def remover_item(self):
-        item_selecionado = self.tree.selection()
-        if not item_selecionado:
-            messagebox.showwarning("Aviso", "Selecione um item para remover!")
-            return
-            
-        if messagebox.askyesno("Confirmar", "Deseja realmente remover o contato selecionado?"):
-            self.tree.delete(item_selecionado)
-            self.limpar_campos()
-    
-    def selecionar_item(self, event):
-        item_selecionado = self.tree.selection()
-        if item_selecionado:
-            valores = self.tree.item(item_selecionado)["values"]
-            for i, campo in enumerate(["Nome", "Telefone", "E-mail", "Cidade"]):
-                self.entries[campo].delete(0, tk.END)
-                
-                if campo == "Telefone":
-                    # Mostra asteriscos ou o valor real conforme a configuração
-                    if not self.mostrar_telefones:
-                        self.entries[campo].config(show="*")
-                        self.entries[campo].insert(0, "*" * len(valores[i]) if i < len(valores) else "")
-                    else:
-                        self.entries[campo].config(show="")
-                        self.entries[campo].insert(0, valores[i] if i < len(valores) else "")
-                else:
-                    self.entries[campo].insert(0, valores[i] if i < len(valores) else "")
-    
-    def limpar_campos(self):
-        for entry in self.entries.values():
-            entry.delete(0, tk.END)
-        # Restaura a máscara do telefone conforme a configuração atual
-        self.entries["Telefone"].config(show="" if self.mostrar_telefones else "*")
-    
-    def ordenar_por(self, col):
-        """Ordena os itens da tabela pela coluna especificada"""
-        items = [(self.tree.set(child, col), child) for child in self.tree.get_children("")]
-        items.sort()
-        
-        for index, (val, child) in enumerate(items):
-            self.tree.move(child, "", index)
-    
-    def filtrar_itens(self, event=None):
-        """Filtra os itens da tabela conforme o texto digitado"""
-        termo = self.search_entry.get().lower()
-        
-        for child in self.tree.get_children(""):
-            valores = self.tree.item(child)["values"]
-            texto = " ".join(str(v) for v in valores).lower()
-            if termo in texto:
-                self.tree.item(child, tags=("mostrar",))
-                self.tree.detach(child)
-                self.tree.reattach(child, "", "end")
-            else:
-                self.tree.detach(child)
+        self.root.title("Fechar Aba pelo Nome")
+        self.root.geometry("400x300")
 
+        self.notebook = ttk.Notebook(root)
+        self.notebook.pack(expand=True, fill="both")
+
+        self.contador_abas = 1
+
+        # Frame de botões
+        frame_controle = ttk.Frame(root)
+        frame_controle.pack(pady=10)
+
+        # Botão para abrir nova aba
+        ttk.Button(frame_controle, text="Abrir Aba", command=self.abrir_aba).grid(row=0, column=0, padx=5)
+
+        # Entrada + botão para fechar aba por nome
+        self.entrada_nome = ttk.Entry(frame_controle, width=15)
+        self.entrada_nome.grid(row=0, column=1)
+        ttk.Button(frame_controle, text="Fechar por Nome", command=self.fechar_aba_por_nome).grid(row=0, column=2, padx=5)
+
+    def abrir_aba(self):
+        nova_aba = ttk.Frame(self.notebook)
+        nome_aba = f"Aba {self.contador_abas}"
+        self.notebook.add(nova_aba, text=nome_aba)
+
+        label = ttk.Label(nova_aba, text=f"Conteúdo da {nome_aba}")
+        label.pack(pady=20)
+
+        self.contador_abas += 1
+
+    def fechar_aba_por_nome(self):
+        nome_procurado = self.entrada_nome.get()
+        for aba_id in self.notebook.tabs():
+            if self.notebook.tab(aba_id, option="text") == nome_procurado:
+                self.notebook.forget(aba_id)
+                break
+        else:
+            print(f"Aba '{nome_procurado}' não encontrada.")
+
+# Executa a aplicação
 if __name__ == "__main__":
     root = tk.Tk()
-    app = TabelaSimples(root)
+    app = AbasDinamicasApp(root)
     root.mainloop()
