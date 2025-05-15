@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from CONFIG import get_connection
+from CONFIG import  get_connection
 
 def ADD_CLIENTE(entries,tree_Cliente):
     conn = get_connection()
