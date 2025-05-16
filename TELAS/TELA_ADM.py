@@ -446,11 +446,11 @@ class TELA_ADM:
             id_func = self.tree_funcionarios.item(item[0])["values"][0]
             UPD_CAMPOS_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, id_func)
 
+
     def ABA_VENDA(self):
         frame = ttk.Frame(self.notebook)
         self.notebook.add(frame, text="VENDAS")
         
-
         form_frame = ttk.LabelFrame(frame, text="Dados da Venda", padding=10)
         form_frame.pack(fill="x", padx=10, pady=5)
 
@@ -467,14 +467,16 @@ class TELA_ADM:
             lbl = ttk.Label(form_frame, text=f"{campo}:")
             lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
             
-         
             if campo == "Cliente":
                 entry = ttk.Combobox(form_frame, width=30) 
                 self.cliente_cb_venda = entry
             elif campo == "Produto":
                 entry = ttk.Combobox(form_frame, width=30) 
                 self.produto_cb_venda = entry
-            elif campo == "Data da Venda":
+            elif campo == "Status Aprovação":
+                entry = ttk.Combobox(form_frame, width=27, 
+                                    values=["Aprovado", "Reprovado", "Em análise"])
+            elif campo == "Data Venda":
                 entry = ttk.Entry(form_frame, width=30)  
             else:
                 entry = ttk.Entry(form_frame, width=30)
@@ -489,8 +491,8 @@ class TELA_ADM:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill="x", padx=10, pady=5)
         botoes = [
-            ("Novo", lambda: ADD_VENDA(self.entries_venda, self.cliente_cb_venda, self.produto_cb_venda, self.tree_vendas, self.funcionario_id)),
-            ("Salvar", lambda: UPD_VENDA(self.entries_venda, self.cliente_cb_venda, self.venda_id, self.tree_vendas, self.funcionario_id)),
+            ("Novo", lambda: ADD_VENDA(self.entries_venda, self.cliente_cb_venda, self.produto_cb_venda, self.tree_vendas, self.funcionario_logado_id)),
+            ("Salvar", lambda: UPD_VENDA(self.entries_venda, self.cliente_cb_venda, self.venda_id, self.tree_vendas, self.funcionario_logado_id)),
             ("Excluir", lambda: DEL_VENDA(self.venda_id, self.tree_vendas))
         ]
         for i, (texto, cmd) in enumerate(botoes):

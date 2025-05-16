@@ -2,75 +2,84 @@ from tkinter import messagebox
 from CONFIG import get_connection
 
 def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree_vendas, funcionario_id):
-    conn = get_connection()
-    cursor = conn.cursor()
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    
-    if hasattr(funcionario_id, 'get'):
-        funcionario_id = funcionario_id.get()
-    
-    # Obter ID do cliente selecionado
-    nome_cliente = cliente_cb.get()
-    cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
-    id_cliente = cursor.fetchone()
+        # Obter o ID do funcionário (tratando se for Entry widget)
+        if hasattr(funcionario_id, 'get'):
+            funcionario_id = funcionario_id.get()
+        if not funcionario_id:
+            messagebox.showwarning("Aviso", "Funcionário não identificado!")
+            return
+        try:
+            funcionario_id = int(funcionario_id)
+        except ValueError:
+            messagebox.showwarning("Aviso", "ID do funcionário inválido!")
+            return
 
-    if not id_cliente:
-        messagebox.showwarning("Aviso", "Cliente não encontrado!")
-        return
+        # Obter ID do cliente
+        nome_cliente = cliente_cb.get()
+        cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
+        id_cliente = cursor.fetchone()
+        if not id_cliente:
+            messagebox.showwarning("Aviso", "Cliente não encontrado!")
+            return
 
-    # Obter ID do produto selecionado
-    nome_produto = produto_cb_venda.get()
-    cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
-    id_produto = cursor.fetchone()
+        # Obter ID do produto
+        nome_produto = produto_cb_venda.get()
+        cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
+        id_produto = cursor.fetchone()
+        if not id_produto:
+            messagebox.showwarning("Aviso", "Produto não encontrado!")
+            return
 
-    if not id_produto:
-        messagebox.showwarning("Aviso", "Produto não encontrado!")
-        return
+        # Inserir nova venda
+        query = """
+        INSERT INTO Venda (data_venda, valor_total_BRL, valor_total_USD, 
+                        status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        valores = (
+            entries["Data Venda"].get(),
+            float(entries["Preço Unitário (BRL)"].get()),
+            float(entries["Preço Unitário (USA)"].get()),
+            entries["Status Aprovação"].get(),
+            id_cliente[0],
+            funcionario_id,
+            entries["Observações"].get(),
+            entries["Forma Pagamento"].get()
+        )
 
-    # Obter nome do funcionário cadastrante
-    cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
-    cadastrante = funcionario_id
+        cursor.execute(query, valores)
+        id_venda = cursor.lastrowid
 
-    # Inserir nova venda
-    query = """
-    INSERT INTO Venda (data_venda, valor_total_BRL, valor_total_USD, 
-                    status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    valores = (
-        entries["Data Venda"].get(),
-        float(entries["Preço Unitário (BRL)"].get()),
-        float(entries["Preço Unitário (USA)"].get()),
-        entries["Status Aprovação"].get(),
-        id_cliente[0],
-        funcionario_id,
-        entries["Observações"].get(),
-        entries["Forma Pagamento"].get() 
-    )
+        # Inserir item da venda
+        query_item = """
+        INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, 
+                            preco_unitario_BRL, preco_unitario_USD)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        valores_item = (
+            id_venda,
+            id_produto[0],
+            int(entries["Quantidade"].get()),
+            float(entries["Preço Unitário (BRL)"].get()),
+            float(entries["Preço Unitário (USA)"].get())
+        )
 
-    cursor.execute(query, valores)
-    id_venda = cursor.lastrowid  # Obtém o ID da venda recém-criada
+        cursor.execute(query_item, valores_item)
+        conn.commit()
 
-    # Inserir item da venda
-    query_item = """
-    INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, 
-                          preco_unitario_BRL, preco_unitario_USD)
-    VALUES (%s, %s, %s, %s, %s)
-    """
-    valores_item = (
-        id_venda,
-        id_produto[0],
-        int(entries["Quantidade"].get()),
-        float(entries["Preço Unitário (BRL)"].get()),
-        float(entries["Preço Unitário (USA)"].get())
-    )
+        messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
+        UPD_TABELA_VENDAS(tree_vendas)
 
-    cursor.execute(query_item, valores_item)
-    conn.commit()
-    messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
-    UPD_TABELA_VENDAS(tree_vendas)
-    cursor.close()
-    conn.close()
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro ao cadastrar a venda:\n{str(e)}")
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
 
 def DEL_VENDA(venda_id, tree):
     id_venda = venda_id.get()
@@ -95,75 +104,99 @@ def DEL_VENDA(venda_id, tree):
         conn.close()
 
 def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_id):
-    id_venda = venda_id.get()
-    if not id_venda:
-        messagebox.showwarning("Aviso", "Selecione uma venda para atualizar!")
-        return
+    try:
+        id_venda = venda_id.get()
+        if not id_venda:
+            messagebox.showwarning("Aviso", "Selecione uma venda para atualizar!")
+            return
 
-    conn = get_connection()
-    cursor = conn.cursor()
+        if hasattr(funcionario_id, 'get'):
+            funcionario_id = funcionario_id.get()
+        if not funcionario_id:
+            messagebox.showwarning("Aviso", "Funcionário não identificado!")
+            return
+        try:
+            funcionario_id = int(funcionario_id)
+        except ValueError:
+            messagebox.showwarning("Aviso", "ID do funcionário inválido!")
+            return
 
-    # Obter ID do cliente selecionado
-    nome_cliente = cliente_cb.get()
-    cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
-    id_cliente = cursor.fetchone()[0]
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    # Obter nome do produto selecionado
-    nome_produto = entries["Produto"].get()
-    cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
-    id_produto = cursor.fetchone()[0]
+        # Obter ID do cliente
+        nome_cliente = cliente_cb.get()
+        cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
+        resultado_cliente = cursor.fetchone()
+        if not resultado_cliente:
+            messagebox.showwarning("Aviso", "Cliente não encontrado!")
+            return
+        id_cliente = resultado_cliente[0]
 
-    # Obter nome do funcionário cadastrante
-    cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
-    cadastrante = funcionario_id
+        # Obter ID do produto
+        nome_produto = entries["Produto"].get()
+        cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
+        resultado_produto = cursor.fetchone()
+        if not resultado_produto:
+            messagebox.showwarning("Aviso", "Produto não encontrado!")
+            return
+        id_produto = resultado_produto[0]
 
-    # Atualizar venda
-    query = """
-    UPDATE Venda SET 
-        data_venda = %s,
-        valor_total_BRL = %s,
-        valor_total_USD = %s,
-        status_aprovacao = %s,
-        ID_Cliente = %s,
-        observacoes = %s,
-        forma_pagamento = %s
-    WHERE ID_Venda = %s
-    """
-    valores = (
-        entries["Data Venda"].get(),
-        float(entries["Preço Unitário (BRL)"].get()),
-        float(entries["Preço Unitário (USA)"].get()),
-        entries["Status Aprovação"].get(),
-        id_cliente,
-        entries["Observações"].get(),
-        entries["Forma Pagamento"].get(),  # Novo campo adicionado
-        id_venda
-    )
-    cursor.execute(query, valores)
-    
-    # Atualizar item da venda
-    query_item = """
-    UPDATE ItemVenda SET 
-        ID_Injetora = %s,
-        quantidade = %s,
-        preco_unitario_BRL = %s,
-        preco_unitario_USD = %s
-    WHERE ID_Venda = %s
-    """
-    valores_item = (
-        id_produto,
-        int(entries["Quantidade"].get()),
-        float(entries["Preço Unitário (BRL)"].get()),
-        float(entries["Preço Unitário (USA)"].get()),
-        id_venda
-    )
+        # Limpar resultados pendentes do SELECT de funcionário, caso necessário
+        cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
+        _ = cursor.fetchone()
 
-    cursor.execute(query_item, valores_item)
-    conn.commit()
-    messagebox.showinfo("Sucesso", "Venda atualizada com sucesso!")
-    UPD_TABELA_VENDAS(tree)
-    cursor.close()
-    conn.close()
+        # Atualizar tabela Venda
+        query = """
+        UPDATE Venda SET 
+            data_venda = %s,
+            valor_total_BRL = %s,
+            valor_total_USD = %s,
+            status_aprovacao = %s,
+            ID_Cliente = %s,
+            observacoes = %s,
+            forma_pagamento = %s
+        WHERE ID_Venda = %s
+        """
+        valores = (
+            entries["Data Venda"].get(),
+            float(entries["Preço Unitário (BRL)"].get()),
+            float(entries["Preço Unitário (USA)"].get()),
+            entries["Status Aprovação"].get(),
+            id_cliente,
+            entries["Observações"].get(),
+            entries["Forma Pagamento"].get(),
+            id_venda
+        )
+        cursor.execute(query, valores)
+
+        # Atualizar tabela ItemVenda
+        query_item = """
+        UPDATE ItemVenda SET 
+            ID_Injetora = %s,
+            quantidade = %s,
+            preco_unitario_BRL = %s,
+            preco_unitario_USD = %s
+        WHERE ID_Venda = %s
+        """
+        valores_item = (
+            id_produto,
+            int(entries["Quantidade"].get()),
+            float(entries["Preço Unitário (BRL)"].get()),
+            float(entries["Preço Unitário (USA)"].get()),
+            id_venda
+        )
+        cursor.execute(query_item, valores_item)
+
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Venda atualizada com sucesso!")
+        UPD_TABELA_VENDAS(tree)
+
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro ao atualizar a venda:\n{str(e)}")
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
 
 def UPD_TABELA_VENDAS(tree):
     conn = get_connection()
@@ -232,7 +265,7 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
         entries["Data Venda"].insert(0, venda["data_venda"])
 
         entries["Forma Pagamento"].delete(0, "end")
-        entries["Forma Pagamento"].insert(0, venda["forma_pagamento"])
+        entries["Forma Pagamento"].insert(0, str(venda["forma_pagamento"]))
 
         entries["Preço Unitário (BRL)"].delete(0, "end")
         entries["Preço Unitário (BRL)"].insert(0, str(venda["preco_unitario_BRL"]))
