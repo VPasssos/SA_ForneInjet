@@ -1,7 +1,9 @@
 from tkinter import messagebox
 from CONFIG import get_connection
+from tkinter import ttk
+import tkinter as tk
 
-def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree_vendas, funcionario_id):
+def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -72,7 +74,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree_vendas, funcionario_id
         conn.commit()
 
         messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
-        UPD_TABELA_VENDAS(tree_vendas)
+        UPD_TABELA_VENDAS(tree)
 
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao cadastrar a venda:\n{str(e)}")
@@ -103,20 +105,20 @@ def DEL_VENDA(venda_id, tree):
         cursor.close()
         conn.close()
 
-def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_id):
+def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
     try:
         id_venda = venda_id.get()
         if not id_venda:
             messagebox.showwarning("Aviso", "Selecione uma venda para atualizar!")
             return
 
-        if hasattr(funcionario_id, 'get'):
-            funcionario_id = funcionario_id.get()
-        if not funcionario_id:
+        if hasattr(funcionario_logado_id, 'get'):
+            funcionario_logado_id = funcionario_logado_id.get()
+        if not funcionario_logado_id:
             messagebox.showwarning("Aviso", "Funcionário não identificado!")
             return
         try:
-            funcionario_id = int(funcionario_id)
+            funcionario_logado_id = int(funcionario_logado_id)
         except ValueError:
             messagebox.showwarning("Aviso", "ID do funcionário inválido!")
             return
@@ -143,7 +145,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_id):
         id_produto = resultado_produto[0]
 
         # Limpar resultados pendentes do SELECT de funcionário, caso necessário
-        cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_id,))
+        cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_logado_id,))
         _ = cursor.fetchone()
 
         # Atualizar tabela Venda
@@ -210,14 +212,12 @@ def UPD_TABELA_VENDAS(tree):
     query = """
     SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
         iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
-        v.data_venda, v.status_aprovacao, f.nome AS cadastrante, 
-        v.observacoes, v.forma_pagamento
+        v.data_venda, v.forma_pagamento, v.status_aprovacao, f.nome AS cadastrante, v.observacoes
     FROM Venda v
     JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
     JOIN ItemVenda iv ON v.ID_Venda = iv.ID_Venda
     JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
     JOIN Funcionario f ON v.ID_Funcionario = f.ID_Funcionario
-    ORDER BY v.data_venda DESC
     """
     cursor.execute(query)
     vendas = cursor.fetchall()
@@ -232,6 +232,7 @@ def UPD_TABELA_VENDAS(tree):
             venda["preco_unitario_BRL"],
             venda["preco_unitario_USD"],
             venda["data_venda"],
+            venda["forma_pagamento"],
             venda["status_aprovacao"],
             venda["cadastrante"],
             venda["observacoes"]
@@ -296,3 +297,71 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
 
     cursor.close()
     conn.close()
+def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
+    # Criar nova janela
+    solicitacao_window = tk.Toplevel(parent_window)
+    solicitacao_window.title("Minhas Solicitações de Venda")
+    solicitacao_window.geometry("1200x600")
+    
+    # Frame para a tabela
+    table_frame = ttk.Frame(solicitacao_window)
+    table_frame.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    # Criar Treeview
+    cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço BRL", "Preço USD", 
+            "Data", "Status", "Forma Pagamento", "Observações"]
+    
+    tree = ttk.Treeview(table_frame, columns=cols, show="headings", height=20)
+    
+    # Configurar colunas
+    for col in cols:
+        tree.heading(col, text=col)
+        tree.column(col, width=100, anchor='center')
+    
+    # Adicionar scrollbar
+    scroll = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+    scroll.pack(side="right", fill="y")
+    tree.configure(yscrollcommand=scroll.set)
+    tree.pack(fill="both", expand=True)
+    
+    # Preencher a tabela com as vendas do funcionário
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = """
+    SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
+           iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+           v.data_venda, v.status_aprovacao, v.forma_pagamento, v.observacoes
+    FROM Venda v
+    JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
+    JOIN ItemVenda iv ON v.ID_Venda = iv.ID_Venda
+    JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
+    WHERE v.ID_Funcionario = %s
+    ORDER BY v.data_venda DESC
+    """
+    
+    cursor.execute(query, (funcionario_id,))
+    vendas = cursor.fetchall()
+    
+    for venda in vendas:
+        tree.insert("", "end", values=(
+            venda["ID_Venda"],
+            venda["cliente"],
+            venda["produto"],
+            venda["quantidade"],
+            venda["preco_unitario_BRL"],
+            venda["preco_unitario_USD"],
+            venda["data_venda"],
+            venda["status_aprovacao"],
+            venda["forma_pagamento"],
+            venda["observacoes"]
+        ))
+    
+    cursor.close()
+    conn.close()
+    
+    # Botão de fechar
+    btn_frame = ttk.Frame(solicitacao_window)
+    btn_frame.pack(fill="x", padx=10, pady=10)
+    
+    ttk.Button(btn_frame, text="Fechar", command=solicitacao_window.destroy).pack(side="right")
