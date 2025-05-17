@@ -239,3 +239,38 @@ def UPD_CAMPOS_FUNCIONARIO(entries, funcionario_id, id_func):
         
     cursor.close()
     conn.close()
+
+def UPD_DADOS_FUNCIONARIOS(id_funcionario):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+   
+    query = """
+    SELECT 
+        f.ID_Funcionario,
+        f.nome,
+        f.cargo,
+        f.telefone,
+        f.email,
+        f.usuario,
+        f.permissao,
+        f.situacao,
+        f.data_admissao,
+        e.rua,
+        e.numero,
+        e.bairro,
+        e.cidade,
+        e.estado,
+        e.cep
+    FROM Funcionario f
+    LEFT JOIN EnderecoFuncionario e ON f.ID_Funcionario = e.ID_Funcionario
+    WHERE f.ID_Funcionario = %s
+    """
+    
+    cursor.execute(query, (id_funcionario,))
+    dados = cursor.fetchone() 
+    
+    cursor.close()
+    conn.close()
+        
+    return dados if dados else {}  
