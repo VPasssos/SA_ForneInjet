@@ -42,16 +42,36 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
                         status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
-        valores = (
-            entries["Data Venda"].get(),
-            float(entries["Preço Unitário (BRL)"].get()),
-            float(entries["Preço Unitário (USA)"].get()),
-            entries["Status Aprovação"].get(),
-            id_cliente[0],
-            funcionario_id,
-            entries["Observações"].get(),
-            entries["Forma Pagamento"].get()
-        )
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT permissao FROM funcionario WHERE id_funcionario = %s", (funcionario_id,))
+
+        permissao = cursor.fetchone()
+        if permissao and permissao[0] == "admin":   
+            valores = (
+                entries["Data Venda"].get(),
+                float(entries["Preço Unitário (BRL)"].get()),
+                float(entries["Preço Unitário (USA)"].get()),
+                entries["Status Aprovação"].get(),
+                id_cliente[0],
+                funcionario_id,
+                entries["Observações"].get(),
+                entries["Forma Pagamento"].get()
+            )
+        else:
+            status_aprovacao = "Em análise"
+            from datetime import date
+            data_atual = date.today()
+            valores = (
+                data_atual,
+                float(entries["Preço Unitário (BRL)"].get()),
+                float(entries["Preço Unitário (USA)"].get()),
+                status_aprovacao,
+                id_cliente[0],
+                funcionario_id,
+                entries["Observações"].get(),
+                entries["Forma Pagamento"].get()
+            )
 
         cursor.execute(query, valores)
         id_venda = cursor.lastrowid

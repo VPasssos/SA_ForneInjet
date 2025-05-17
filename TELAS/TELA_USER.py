@@ -34,10 +34,9 @@ class TELA_USER:
         nomes_injetoras = [injetora[1] for injetora in injetoras]
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
-            ("Quantidade", 1, 0),
-            ("Preço Unitário (BRL)", 2, 0), ("Preço Unitário (USA)", 2, 2),
-            ("Data Venda", 3, 0), ("Forma Pagamento", 3, 2),
-            ("Status Aprovação", 4, 0), ("Observações", 4, 2)
+            ("Quantidade", 1, 0), ("Preço Unitário (BRL)", 1, 2),
+            ("Forma Pagamento", 2, 0), ("Preço Unitário (USA)", 2, 2), 
+            ("Observações", 3, 0)
         ]
         
         self.entries_venda = {}
@@ -123,7 +122,7 @@ class TELA_USER:
 
     def ABA_CONFIGURACAO(self):
         frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="Configuração")
+        self.notebook.add(frame, text="CONFIGURAÇÃO")
 
         info_frame = ttk.LabelFrame(frame, text="Dados do Funcionário")
         info_frame.pack(fill="x", padx=10, pady=10)
@@ -131,7 +130,6 @@ class TELA_USER:
         dados = self.funcionario_dados
 
         # Labels com os dados do funcionário
-        ttk.Label(info_frame, text=f"ID: {dados.get('ID_Funcionario', '')}").pack(anchor="w", padx=10, pady=2)
         ttk.Label(info_frame, text=f"Nome: {dados.get('nome', '')}").pack(anchor="w", padx=10, pady=2)
         ttk.Label(info_frame, text=f"Cargo: {dados.get('cargo', '')}").pack(anchor="w", padx=10, pady=2)
         ttk.Label(info_frame, text=f"Telefone: {dados.get('telefone', '')}").pack(anchor="w", padx=10, pady=2)
