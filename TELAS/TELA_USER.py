@@ -30,7 +30,6 @@ class TELA_USER:
         clientes = GET_CLIENTES()
         injetoras = GET_INJETORA()
         
-        # Criar lista de nomes de clientes para o Combobox
         nomes_clientes = [cliente[1] for cliente in clientes]
         nomes_injetoras = [injetora[1] for injetora in injetoras]
         campos = [

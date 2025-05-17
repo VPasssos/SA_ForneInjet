@@ -454,6 +454,14 @@ class TELA_ADM:
         form_frame = ttk.LabelFrame(frame, text="Dados da Venda", padding=10)
         form_frame.pack(fill="x", padx=10, pady=5)
 
+        from CRUDS.CRUD_CLIENTE import GET_CLIENTES  
+        from CRUDS.CRUD_INJETORA import GET_INJETORA  
+        clientes = GET_CLIENTES()
+        injetoras = GET_INJETORA()
+        
+        nomes_clientes = [cliente[1] for cliente in clientes]
+        nomes_injetoras = [injetora[1] for injetora in injetoras]
+
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
             ("Quantidade", 1, 0), ("Cadastrante", 1, 2),
@@ -468,10 +476,10 @@ class TELA_ADM:
             lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
             
             if campo == "Cliente":
-                entry = ttk.Combobox(form_frame, width=30) 
+                entry = ttk.Combobox(form_frame, width=30, values=nomes_clientes) 
                 self.cliente_cb_venda = entry
             elif campo == "Produto":
-                entry = ttk.Combobox(form_frame, width=30) 
+                entry = ttk.Combobox(form_frame, width=30, values=nomes_injetoras) 
                 self.produto_cb_venda = entry
             elif campo == "Status Aprovação":
                 entry = ttk.Combobox(form_frame, width=27, 
