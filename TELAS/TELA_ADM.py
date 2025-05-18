@@ -367,7 +367,7 @@ class TELA_ADM:
                 entry = ttk.Entry(form_frame, width=30, show="*") 
             elif campo in ["Permissão", "Situação"]:
                 entry = ttk.Combobox(form_frame, width=27, 
-                                values=["admin", "usuario"] if campo == "Permissão" else ["ativo", "inativo"])
+                                values=["admin", "usuario", "gestor"] if campo == "Permissão" else ["ativo", "inativo"])
             else:
                 entry = ttk.Entry(form_frame, width=30)
             
@@ -382,7 +382,7 @@ class TELA_ADM:
         btn_frame.pack(fill="x", padx=10, pady=5)
 
         botoes = [
-            ("Novo", lambda: ADD_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, self.tree_funcionarios)),
+            ("Novo", lambda: ADD_FUNCIONARIO(self.entries_funcionario, self.tree_funcionarios)),
             ("Salvar", lambda: UPD_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, self.tree_funcionarios)),
             ("Excluir", lambda: DEL_FUNCIONARIO(self.funcionario_id, self.tree_funcionarios))
         ]
@@ -463,11 +463,14 @@ class TELA_ADM:
 
         from CRUDS.CRUD_CLIENTE import GET_CLIENTES  
         from CRUDS.CRUD_INJETORA import GET_INJETORA  
+        from CRUDS.CRUD_FUNCIONARIO import GET_FUNCIONARIO  
         clientes = GET_CLIENTES()
         injetoras = GET_INJETORA()
+        funcionarios = GET_FUNCIONARIO()
         
         nomes_clientes = [cliente[1] for cliente in clientes]
         nomes_injetoras = [injetora[1] for injetora in injetoras]
+        nomes_funcionarios = [funcionario[1] for funcionario in funcionarios]
 
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
@@ -488,6 +491,9 @@ class TELA_ADM:
             elif campo == "Produto":
                 entry = ttk.Combobox(form_frame, width=30, values=nomes_injetoras) 
                 self.produto_cb_venda = entry
+            elif campo == "Cadastrante":
+                entry = ttk.Combobox(form_frame, width=30, values=nomes_funcionarios) 
+                self.funcionario_cb_venda = entry
             elif campo == "Status Aprovação":
                 entry = ttk.Combobox(form_frame, width=27, 
                                     values=["Aprovado", "Reprovado", "Em análise"])

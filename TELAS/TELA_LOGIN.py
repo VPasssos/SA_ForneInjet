@@ -73,8 +73,11 @@ class TELA_LOGIN:
         if permissao == "admin":
             TELA_ADM(main_window, id_funcionario)
             self.root.withdraw()
-        else:
+        elif permissao == "gestor":
             TELA_GERENTE(main_window, id_funcionario)
+            self.root.withdraw()
+        else:
+            TELA_USER(main_window, id_funcionario)
             self.root.withdraw()
         main_window.protocol("WM_DELETE_WINDOW", self.VOLTAR_LOGIN)
     

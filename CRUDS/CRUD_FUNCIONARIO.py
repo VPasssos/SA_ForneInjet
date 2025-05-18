@@ -274,3 +274,13 @@ def UPD_DADOS_FUNCIONARIOS(id_funcionario):
     conn.close()
         
     return dados if dados else {}  
+
+def GET_FUNCIONARIO():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT ID_Funcionario, nome FROM funcionario ORDER BY nome")
+    clientes = cursor.fetchall()
+    
+    conn.close()
+    return clientes

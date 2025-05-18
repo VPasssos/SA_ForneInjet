@@ -40,8 +40,9 @@ class TELA_GERENTE:
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
         
         # Colunas da tabela
-        cols = ["ID", "Cliente", "Produto", "Quantidade", "Valor Total (BRL)", 
-                "Data Venda", "Status", "Vendedor", "Observações"]
+        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)",
+                "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento",
+                "Status Aprovação", "Cadastrante", "Observações"]
         
         self.tree_gestao = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
         

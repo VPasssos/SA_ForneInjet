@@ -2,6 +2,7 @@ from tkinter import messagebox
 from CONFIG import get_connection
 from tkinter import ttk
 import tkinter as tk
+from datetime import datetime
 
 def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
     try:
@@ -385,3 +386,172 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     btn_frame.pack(fill="x", padx=10, pady=10)
     
     ttk.Button(btn_frame, text="Fechar", command=solicitacao_window.destroy).pack(side="right")
+
+def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor, justificativa=None):
+    """
+    Atualiza o status de aprovação de uma venda no banco de dados
+
+    Args:
+        venda_id (int): ID da venda a ser atualizada
+        novo_status (str): Novo status ('Aprovado', 'Reprovado', 'Em análise')
+        id_gestor (int): ID do funcionário que está realizando a aprovação
+        justificativa (str, optional): Justificativa para mudança de status
+
+    Returns:
+        bool: True se a atualização foi bem-sucedida, False caso contrário
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Verificar se a venda existe
+    cursor.execute("SELECT ID_Venda FROM Venda WHERE ID_Venda = %s", (venda_id,))
+    if not cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return False
+
+    # Atualizar o status da venda
+    query = """
+    UPDATE Venda 
+    SET status_aprovacao = %s, 
+        aprovado_por = %s, 
+        data_aprovacao = %s,
+        justificativa_status = %s
+    WHERE ID_Venda = %s
+    """
+    data_aprovacao = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cursor.execute(query, (novo_status, id_gestor, data_aprovacao, justificativa, venda_id))
+
+    # Registrar no histórico
+    query_historico = """
+    INSERT INTO HistoricoStatusVenda 
+    (ID_Venda, status_anterior, status_novo, data_alteracao, alterado_por, justificativa)
+    SELECT 
+        %s, 
+        status_aprovacao, 
+        %s, 
+        %s, 
+        %s, 
+        %s
+    FROM Venda 
+    WHERE ID_Venda = %s
+    """
+    cursor.execute(query_historico, (venda_id, novo_status, data_aprovacao, id_gestor, justificativa, venda_id))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return True
+
+def GET_DETALHES_VENDA(venda_id):
+    """
+    Obtém todos os detalhes de uma venda específica, incluindo itens vendidos
+
+    Args:
+        venda_id (int): ID da venda a ser consultada
+
+    Returns:
+        dict: Dicionário com todos os detalhes da venda e seus itens
+              Retorna None se a venda não for encontrada
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Consulta principal da venda
+    query_venda = """
+    SELECT 
+        v.ID_Venda,
+        c.nome AS nome_cliente,
+        f.nome AS nome_vendedor,
+        v.data_venda,
+        v.status_aprovacao,
+        v.valor_total_BRL,
+        v.valor_total_USD,
+        v.forma_pagamento,
+        v.observacoes,
+        ap.nome AS nome_aprovador,
+        v.data_aprovacao,
+        v.justificativa_status
+    FROM Venda v
+    JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
+    JOIN Funcionario f ON v.ID_Funcionario = f.ID_Funcionario
+    LEFT JOIN Funcionario ap ON v.aprovado_por = ap.ID_Funcionario
+    WHERE v.ID_Venda = %s
+    """
+    cursor.execute(query_venda, (venda_id,))
+    venda = cursor.fetchone()
+
+    if not venda:
+        cursor.close()
+        conn.close()
+        return None
+
+    # Consulta dos itens da venda
+    query_itens = """
+    SELECT 
+        i.marca, 
+        i.modelo,
+        iv.quantidade,
+        iv.preco_unitario_BRL,
+        iv.preco_unitario_USD,
+        (iv.quantidade * iv.preco_unitario_BRL) AS subtotal_BRL
+    FROM ItemVenda iv
+    JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
+    WHERE iv.ID_Venda = %s
+    """
+    cursor.execute(query_itens, (venda_id,))
+    itens = cursor.fetchall()
+
+    # Consulta do histórico de status
+    query_historico = """
+    SELECT 
+        status_novo,
+        data_alteracao,
+        f.nome AS alterado_por,
+        justificativa
+    FROM HistoricoStatusVenda h
+    JOIN Funcionario f ON h.alterado_por = f.ID_Funcionario
+    WHERE h.ID_Venda = %s
+    ORDER BY data_alteracao DESC
+    """
+    cursor.execute(query_historico, (venda_id,))
+    historico = cursor.fetchall()
+
+    # Formatando os dados para retorno
+    detalhes = {
+        'id_venda': venda['ID_Venda'],
+        'nome_cliente': venda['nome_cliente'],
+        'nome_vendedor': venda['nome_vendedor'],
+        'data_venda': venda['data_venda'].strftime('%d/%m/%Y') if venda['data_venda'] else '',
+        'status_aprovacao': venda['status_aprovacao'],
+        'valor_total_BRL': float(venda['valor_total_BRL']) if venda['valor_total_BRL'] else 0.0,
+        'valor_total_USD': float(venda['valor_total_USD']) if venda['valor_total_USD'] else 0.0,
+        'forma_pagamento': venda['forma_pagamento'],
+        'observacoes': venda['observacoes'],
+        'aprovado_por': venda['nome_aprovador'],
+        'data_aprovacao': venda['data_aprovacao'].strftime('%d/%m/%Y %H:%M') if venda.get('data_aprovacao') else '',
+        'justificativa': venda.get('justificativa_status', ''),
+        'itens': [],
+        'historico': []
+    }
+
+    for item in itens:
+        detalhes['itens'].append({
+            'nome_produto': f"{item['marca']} {item['modelo']}",
+            'quantidade': item['quantidade'],
+            'preco_unitario_BRL': float(item['preco_unitario_BRL']),
+            'preco_unitario_USD': float(item['preco_unitario_USD']),
+            'subtotal_BRL': float(item['subtotal_BRL'])
+        })
+
+    for registro in historico:
+        detalhes['historico'].append({
+            'status': registro['status_novo'],
+            'data': registro['data_alteracao'].strftime('%d/%m/%Y %H:%M'),
+            'alterado_por': registro['alterado_por'],
+            'justificativa': registro.get('justificativa', '')
+        })
+
+    cursor.close()
+    conn.close()
+    return detalhes
