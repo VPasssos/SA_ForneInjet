@@ -64,7 +64,7 @@ class TELA_ADM:
         btn_frame.pack(fill="x", padx=10, pady=5)
 
         botoes = [
-            ("Novo", lambda: ADD_INJETORA(self.entries_injetora, self.fornecedor_id , self.tree_injetoras)),
+            ("Novo", lambda: ADD_INJETORA(self.entries_injetora, self.fornecedor_cb_injetora , self.tree_injetoras)),
             ("Salvar", lambda: UPD_INJETORA(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id, self.tree_injetoras)),
             ("Excluir", lambda: DEL_INJETORA(self.injetora_id, self.tree_injetoras))
         ]
