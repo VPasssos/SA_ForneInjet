@@ -1,8 +1,8 @@
 -- ======================
 -- CRIAÇÃO DO BANCO
 -- ======================
-CREATE DATABASE ForneInjet;
-USE ForneInjet;
+CREATE DATABASE IF NOT EXISTS forneinjet;
+USE forneinjet;
 
 -- ======================
 -- TABELA: Funcionário
@@ -15,8 +15,8 @@ CREATE TABLE Funcionario (
     email VARCHAR(100) UNIQUE,
     usuario VARCHAR(50) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    permissao VARCHAR(20), -- Ex: 'admin', 'usuario'
-    situacao VARCHAR(20),  -- Ex: 'ativo', 'inativo'
+    permissao VARCHAR(20), -- Ex: 'admin', 'usuario', 'gestor'
+    situacao VARCHAR(20) DEFAULT 'ativo',  -- Ex: 'ativo', 'inativo'
     data_admissao DATE
 );
 
@@ -145,7 +145,7 @@ CREATE TABLE EnderecoCliente (
 );
 
 -- ======================
--- TABELA: Venda
+-- TABELA: Venda (ATUALIZADA)
 -- ======================
 CREATE TABLE Venda (
     ID_Venda INT PRIMARY KEY AUTO_INCREMENT,
@@ -156,9 +156,13 @@ CREATE TABLE Venda (
     valor_total_BRL DECIMAL(12,2),
     valor_total_USD DECIMAL(12,2),
     observacoes TEXT,
-    status_aprovacao VARCHAR(20),
+    status_aprovacao VARCHAR(20) DEFAULT 'Em análise', -- 'Aprovado', 'Reprovado', 'Em análise'
+    aprovado_por INT, -- ID do gestor que aprovou/reprovou
+    data_aprovacao DATETIME, -- Data e hora da aprovação/reprovação
+    justificativa_status TEXT, -- Justificativa para reprovação
     FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente),
-    FOREIGN KEY (ID_Funcionario) REFERENCES Funcionario(ID_Funcionario)
+    FOREIGN KEY (ID_Funcionario) REFERENCES Funcionario(ID_Funcionario),
+    FOREIGN KEY (aprovado_por) REFERENCES Funcionario(ID_Funcionario)
 );
 
 -- ======================
@@ -174,3 +178,60 @@ CREATE TABLE ItemVenda (
     FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda),
     FOREIGN KEY (ID_Injetora) REFERENCES Injetora(ID_Injetora)
 );
+
+-- ======================
+-- TABELA: Histórico de Status de Venda (OPCIONAL)
+-- ======================
+CREATE TABLE HistoricoStatusVenda (
+    ID_Historico INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Venda INT NOT NULL,
+    status_anterior VARCHAR(20),
+    status_novo VARCHAR(20) NOT NULL,
+    data_alteracao DATETIME NOT NULL,
+    alterado_por INT NOT NULL,
+    justificativa TEXT,
+    FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda),
+    FOREIGN KEY (alterado_por) REFERENCES Funcionario(ID_Funcionario)
+);
+
+-- ======================
+-- ÍNDICES PARA MELHOR PERFORMANCE
+-- ======================
+CREATE INDEX idx_venda_status ON Venda(status_aprovacao);
+CREATE INDEX idx_venda_cliente ON Venda(ID_Cliente);
+CREATE INDEX idx_venda_funcionario ON Venda(ID_Funcionario);
+CREATE INDEX idx_venda_data ON Venda(data_venda);
+CREATE INDEX idx_item_venda ON ItemVenda(ID_Venda);
+
+-- ======================
+-- TRIGGERS DE ESTOQUE BASEADO EM APROVAÇÃO
+-- ======================
+DELIMITER $$
+
+-- Abaixa o estoque ao aprovar a venda
+CREATE TRIGGER tr_aprova_venda_estoque
+AFTER UPDATE ON Venda
+FOR EACH ROW
+BEGIN
+    IF OLD.status_aprovacao <> 'Aprovado' AND NEW.status_aprovacao = 'Aprovado' THEN
+        UPDATE Injetora i
+        JOIN ItemVenda iv ON iv.ID_Injetora = i.ID_Injetora
+        SET i.quantidade = i.quantidade - iv.quantidade
+        WHERE iv.ID_Venda = NEW.ID_Venda;
+    END IF;
+END$$
+
+-- Reverte o estoque se a venda aprovada for reprovada depois
+CREATE TRIGGER tr_reprova_venda_estoque
+AFTER UPDATE ON Venda
+FOR EACH ROW
+BEGIN
+    IF OLD.status_aprovacao = 'Aprovado' AND NEW.status_aprovacao = 'Reprovado' THEN
+        UPDATE Injetora i
+        JOIN ItemVenda iv ON iv.ID_Injetora = i.ID_Injetora
+        SET i.quantidade = i.quantidade + iv.quantidade
+        WHERE iv.ID_Venda = NEW.ID_Venda;
+    END IF;
+END$$
+
+DELIMITER ;
