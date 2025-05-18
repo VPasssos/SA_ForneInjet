@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Frame, Label
 from TELAS.TELA_ADM import TELA_ADM
 from TELAS.TELA_USER import TELA_USER
+from TELAS.TELA_GERENTE import TELA_GERENTE
 from CONFIG import get_connection
 class TELA_LOGIN:
     def __init__(self, root):
@@ -73,7 +74,7 @@ class TELA_LOGIN:
             TELA_ADM(main_window, id_funcionario)
             self.root.withdraw()
         else:
-            TELA_USER(main_window, id_funcionario)
+            TELA_GERENTE(main_window, id_funcionario)
             self.root.withdraw()
         main_window.protocol("WM_DELETE_WINDOW", self.VOLTAR_LOGIN)
     

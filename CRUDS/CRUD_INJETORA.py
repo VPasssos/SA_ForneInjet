@@ -194,3 +194,13 @@ def UPD_CAMPOS_INJETORA(entries, fornecedor_cb, injetora_id, id_inj, fornecedore
         
     cursor.close()
     conn.close()
+
+def GET_INJETORA():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT ID_Injetora, modelo FROM injetora ORDER BY modelo")
+    clientes = cursor.fetchall()
+    
+    conn.close()
+    return clientes

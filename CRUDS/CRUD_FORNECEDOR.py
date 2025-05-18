@@ -215,3 +215,13 @@ def UPD_CAMPOS_FORNECEDOR(entries, fornecedor_id, id_for):
         
     cursor.close()
     conn.close()
+
+def GET_FORNECEDOR():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT ID_Fornecedor, NM_Fornecedor FROM fornecedor ORDER BY NM_Fornecedor")
+    clientes = cursor.fetchall()
+    
+    conn.close()
+    return clientes
