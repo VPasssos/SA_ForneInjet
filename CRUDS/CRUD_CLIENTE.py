@@ -51,6 +51,7 @@ def ADD_CLIENTE(entries, tree_cliente, funcionario_id):
         conn.commit()
         messagebox.showinfo("Sucesso", "Cliente cadastrado com sucesso!")
         UPD_TABELA_CLIENTE(tree_cliente)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         if conn:
@@ -91,7 +92,7 @@ def DEL_CLIENTE(cliente_id, tree):
         conn.commit()
         messagebox.showinfo("Sucesso", "Cliente excluído com sucesso!")
         UPD_TABELA_CLIENTE(tree)
-        
+
     except Exception as e:
         if conn:
             conn.rollback()
@@ -181,6 +182,7 @@ def UPD_CLIENTE(entries, cliente_id, tree, funcionario_id):
         
         messagebox.showinfo("Sucesso", "Cliente atualizado com sucesso!")
         UPD_TABELA_CLIENTE(tree)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         if conn:
@@ -293,3 +295,7 @@ def GET_CLIENTES():
             cursor.close()
         if conn:
             conn.close()
+
+def LIMPAR_CAMPOS(entries):
+    for entry in entries.values():
+        entry.delete(0, "end")

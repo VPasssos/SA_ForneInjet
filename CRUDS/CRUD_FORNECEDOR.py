@@ -52,6 +52,7 @@ def ADD_FORNECEDOR(entries, tree_fornecedor, funcionario_id):
         conn.commit()
         messagebox.showinfo("Sucesso", "Fornecedor cadastrado com sucesso!")
         UPD_TABELA_FORNECEDOR(tree_fornecedor)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         if conn:
@@ -184,6 +185,7 @@ def UPD_FORNECEDOR(entries, fornecedor_id, tree, funcionario_id):
         
         messagebox.showinfo("Sucesso", "Fornecedor atualizado com sucesso!")
         UPD_TABELA_FORNECEDOR(tree)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         if conn:
@@ -298,3 +300,7 @@ def GET_FORNECEDOR():
             cursor.close()
         if conn:
             conn.close()
+
+def LIMPAR_CAMPOS(entries):
+    for entry in entries.values():
+        entry.delete(0, "end")

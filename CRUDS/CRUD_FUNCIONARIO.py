@@ -80,7 +80,7 @@ def ADD_FUNCIONARIO(entries, tree_funcionarios, funcionario_logado_id):
         conn.commit()
         messagebox.showinfo("Sucesso", "Funcionário cadastrado com sucesso!")
         UPD_TABELA_FUNCIONARIO(tree_funcionarios)
-
+        LIMPAR_CAMPOS(entries)
     except Exception as e:
         if conn:
             conn.rollback()
@@ -235,6 +235,7 @@ def UPD_FUNCIONARIO(entries, funcionario_id, tree, funcionario_logado_id):
         
         messagebox.showinfo("Sucesso", "Funcionário atualizado com sucesso!")
         UPD_TABELA_FUNCIONARIO(tree)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         if conn:
@@ -395,3 +396,7 @@ def UPD_DADOS_FUNCIONARIOS(id_funcionario):
             cursor.close()
         if conn:
             conn.close()
+
+def LIMPAR_CAMPOS(entries):
+    for entry in entries.values():
+        entry.delete(0, "end")

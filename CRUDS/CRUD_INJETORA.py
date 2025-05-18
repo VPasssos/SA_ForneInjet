@@ -41,6 +41,7 @@ def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
         conn.commit()
         messagebox.showinfo("Sucesso", "Injetora cadastrada com sucesso!")
         UPD_TABELA_IJETORA(tree_injetoras)
+        LIMPAR_CAMPOS(entries)
         
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
@@ -129,6 +130,7 @@ def UPD_INJETORA(entries, fornecedor_cb, injetora_id, tree):
     conn.commit()
     messagebox.showinfo("Sucesso", "Injetora atualizada com sucesso!")
     UPD_TABELA_IJETORA(tree)
+    LIMPAR_CAMPOS(entries)
     cursor.close()
     conn.close()
 
@@ -230,3 +232,7 @@ def GET_INJETORA():
     
     conn.close()
     return clientes
+
+def LIMPAR_CAMPOS(entries):
+    for entry in entries.values():
+        entry.delete(0, "end")

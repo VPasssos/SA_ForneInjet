@@ -96,6 +96,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
 
         messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
         UPD_TABELA_VENDAS(tree)
+        LIMPAR_CAMPOS(entries)
 
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao cadastrar a venda:\n{str(e)}")
@@ -214,6 +215,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         conn.commit()
         messagebox.showinfo("Sucesso", "Venda atualizada com sucesso!")
         UPD_TABELA_VENDAS(tree)
+        LIMPAR_CAMPOS(entries)
 
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao atualizar a venda:\n{str(e)}")
@@ -555,3 +557,7 @@ def GET_DETALHES_VENDA(venda_id):
     cursor.close()
     conn.close()
     return detalhes
+
+def LIMPAR_CAMPOS(entries):
+    for entry in entries.values():
+        entry.delete(0, "end")
