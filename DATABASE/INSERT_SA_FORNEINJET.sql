@@ -1,8 +1,8 @@
 USE forneinjet;
 INSERT INTO Funcionario (nome, cargo, telefone, email, usuario, senha, permissao, situacao, data_admissao) VALUES
 ('Ana Carolina Mendes', 'Gerente Comercial', '(11) 98765-4321', 'ana.mendes@forneinjet.com', 'ana.mendes', "ana.123321", 'admin', 'ativo', '2018-05-10'),
-('Carlos Eduardo Lima', 'Vendedor Sênior', '(11) 98765-1234', 'carlos.lima@forneinjet.com', 'carlos.lima', "", 'carlos.321123', 'ativo', '2019-03-15'),
-('Mariana Souza Santos', 'Compradora', '(11) 98765-5678', 'mariana.souza@forneinjet.com', 'mariana.souza', "", 'gestor', 'mariana.159951', '2020-02-20'),
+('Carlos Eduardo Lima', 'Vendedor Sênior', '(11) 98765-1234', 'carlos.lima@forneinjet.com', 'carlos.lima', 'carlos.321123', 'usuario' , 'ativo', '2019-03-15'),
+('Mariana Souza Santos', 'Compradora', '(11) 98765-5678', 'mariana.souza@forneinjet.com', 'mariana.souza', 'mariana.159951', 'gestor', 'ativo', '2020-02-20'),
 ('Ricardo Oliveira', 'Analista Financeiro', '(11) 98765-8765', 'ricardo.oliveira@forneinjet.com', 'ricardo.oliveira', "ricardo.753357", 'usuario', 'ativo', '2021-07-05'),
 ('Fernanda Costa', 'Assistente Administrativo', '(11) 98765-2345', 'fernanda.costa@forneinjet.com', 'fernanda.costa', "fernanda.357753", 'usuario', 'ativo', '2022-01-30');
 INSERT INTO EnderecoFuncionario (ID_Funcionario, rua, numero, bairro, cidade, estado, cep) VALUES

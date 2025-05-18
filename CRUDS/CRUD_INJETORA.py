@@ -2,59 +2,85 @@ from tkinter import messagebox
 from CONFIG import get_connection
 
 def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
-    conn = get_connection()
-    cursor = conn.cursor()
-    
-    # Obter ID do fornecedor selecionado
-    nome_fornecedor = fornecedor_cb.get()
-    cursor.execute("SELECT ID_Fornecedor FROM Fornecedor WHERE NM_Fornecedor = %s", (nome_fornecedor,))
-    id_fornecedor = cursor.fetchone()
-    
-    # Inserir nova injetora
-    query = """
-    INSERT INTO Injetora (marca, modelo, tipo_de_controle, capacidade_de_injecao, 
-                         forca_de_fechamento, preco_medio_USD, preco_medio_BRL, 
-                         quantidade, observacao, ID_Fornecedor)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    valores = (
-        entries["Marca"].get(),
-        entries["Modelo"].get(),
-        entries["Tipo de Controle"].get(),
-        float(entries["Capacidade de Injeção (g)"].get()),
-        float(entries["Força de Fechamento (ton)"].get()),
-        float(entries["Preço Médio (USD)"].get()),
-        float(entries["Preço Médio (BRL)"].get()),
-        int(entries["Quantidade"].get()),
-        entries["Observações"].get(),
-        id_fornecedor
-    )
-    
-    cursor.execute(query, valores)
-    conn.commit()
-    messagebox.showinfo("Sucesso", "Injetora cadastrada com sucesso!")
-    UPD_TABELA_IJETORA(tree_injetoras)
-    cursor.close()
-    conn.close()
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Obter ID do fornecedor selecionado
+        nome_fornecedor = fornecedor_cb.get()
+        cursor.execute("SELECT ID_Fornecedor FROM Fornecedor WHERE NM_Fornecedor = %s", (nome_fornecedor,))
+        id_fornecedor = cursor.fetchone()
+        
+        if id_fornecedor is None:
+            messagebox.showerror("Erro", "Fornecedor não encontrado!")
+            return
+            
+        id_fornecedor = id_fornecedor[0]
 
+        # Inserir nova injetora
+        query = """
+        INSERT INTO Injetora (marca, modelo, tipo_de_controle, capacidade_de_injecao, 
+                             forca_de_fechamento, preco_medio_USD, preco_medio_BRL, 
+                             quantidade, observacao, ID_Fornecedor)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        valores = (
+            entries["Marca"].get(),
+            entries["Modelo"].get(),
+            entries["Tipo de Controle"].get(),
+            int(entries["Capacidade de Injeção (g)"].get()),  # Alterado para int
+            int(entries["Força de Fechamento (ton)"].get()),  # Alterado para int
+            float(entries["Preço Médio (USD)"].get()),
+            float(entries["Preço Médio (BRL)"].get()),
+            int(entries["Quantidade"].get()),
+            entries["Observações"].get(),
+            id_fornecedor
+        )
+        
+        cursor.execute(query, valores)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Injetora cadastrada com sucesso!")
+        UPD_TABELA_IJETORA(tree_injetoras)
+        
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        if 'conn' in locals(): conn.close()
+        
 def DEL_INJETORA(injetora_id, tree):
     id_inj = injetora_id.get()
     if not id_inj:
         messagebox.showwarning("Aviso", "Selecione uma injetora para excluir!")
         return
         
-    resposta = messagebox.askyesno("Confirmar", "Deseja realmente excluir esta injetora?")
+    resposta = messagebox.askyesno("Confirmar", "Deseja realmente excluir esta injetora? Esta ação também excluirá todos os itens de venda associados.")
     if resposta:
-        conn = get_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("DELETE FROM Injetora WHERE ID_Injetora = %s", (id_inj,))
-        conn.commit()
-        
-        messagebox.showinfo("Sucesso", "Injetora excluída com sucesso!")
-        UPD_TABELA_IJETORA(tree)
-        cursor.close()
-        conn.close()
+        conn = None
+        cursor = None
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            
+            # Primeiro, excluir os itens de venda associados
+            cursor.execute("DELETE FROM ItemVenda WHERE ID_Injetora = %s", (id_inj,))
+            
+            # Depois, excluir a injetora
+            cursor.execute("DELETE FROM Injetora WHERE ID_Injetora = %s", (id_inj,))
+            
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Injetora e itens associados excluídos com sucesso!")
+            UPD_TABELA_IJETORA(tree)
+            
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            messagebox.showerror("Erro", f"Ocorreu um erro ao excluir: {str(e)}")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
 def UPD_INJETORA(entries, fornecedor_cb, injetora_id, tree):
     id_inj = injetora_id.get()
@@ -89,8 +115,8 @@ def UPD_INJETORA(entries, fornecedor_cb, injetora_id, tree):
         entries["Marca"].get(),
         entries["Modelo"].get(),
         entries["Tipo de Controle"].get(),
-        float(entries["Capacidade de Injeção (g)"].get()),
-        float(entries["Força de Fechamento (ton)"].get()),
+        int(entries["Capacidade de Injeção (g)"].get()),
+        int(entries["Força de Fechamento (ton)"].get()),
         float(entries["Preço Médio (USD)"].get()),
         float(entries["Preço Médio (BRL)"].get()),
         int(entries["Quantidade"].get()),

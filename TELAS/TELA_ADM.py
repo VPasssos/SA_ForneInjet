@@ -19,7 +19,7 @@ class TELA_ADM:
         self.notebook.pack(fill="both", expand=True)
         
         self.ABA_VENDA()
-        # self.ABA_CLIENTE()
+        self.ABA_CLIENTE()
         self.ABA_INJETORAS()
         self.ABA_FORNECEDORES()
         self.ABA_FUNCIONARIOS()
@@ -169,7 +169,7 @@ class TELA_ADM:
         btn_frame.pack(fill="x", padx=10, pady=5)
 
         botoes = [
-            ("Novo", lambda: ADD_FORNECEDOR(self.entries_fornecedor, self.tree_fornecedor)),
+            ("Novo", lambda: ADD_FORNECEDOR(self.entries_fornecedor, self.tree_fornecedor, self.funcionario_logado_id)),
             ("Salvar", lambda: UPD_FORNECEDOR(self.entries_fornecedor, self.fornecedor_id, self.tree_fornecedor, self.funcionario_logado_id)),
             ("Excluir", lambda: DEL_FORNECEDOR(self.fornecedor_id, self.tree_fornecedor))
         ]
@@ -273,7 +273,7 @@ class TELA_ADM:
         btn_frame.pack(fill="x", padx=10, pady=5)
 
         botoes = [
-            ("Novo", lambda: ADD_CLIENTE(self.entries_cliente, self.tree_cliente)),
+            ("Novo", lambda: ADD_CLIENTE(self.entries_cliente, self.tree_cliente, self.funcionario_logado_id)),
             ("Salvar", lambda: UPD_CLIENTE(self.entries_cliente, self.cliente_id, self.tree_cliente, self.funcionario_logado_id)),
             ("Excluir", lambda: DEL_CLIENTE(self.cliente_id, self.tree_cliente))
         ]
@@ -294,7 +294,7 @@ class TELA_ADM:
         self.search_entry_cliente.pack(side="left", fill="x", expand=True)
         self.search_entry_cliente.bind("<KeyRelease>", self.filtrar_itens_cliente)
 
-        cols = ["ID","Nome", "CNPJ", "Telefone", "E-mail", "Website", "Endereço"]
+        cols = ["ID","Nome", "CNPJ", "Telefone", "E-mail", "Endereço"]
         self.tree_cliente = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
         for col in cols:
@@ -382,9 +382,9 @@ class TELA_ADM:
         btn_frame.pack(fill="x", padx=10, pady=5)
 
         botoes = [
-            ("Novo", lambda: ADD_FUNCIONARIO(self.entries_funcionario, self.tree_funcionarios)),
-            ("Salvar", lambda: UPD_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, self.tree_funcionarios)),
-            ("Excluir", lambda: DEL_FUNCIONARIO(self.funcionario_id, self.tree_funcionarios))
+            ("Novo", lambda: ADD_FUNCIONARIO(self.entries_funcionario, self.tree_funcionarios, self.funcionario_logado_id)),
+            ("Salvar", lambda: UPD_FUNCIONARIO(self.entries_funcionario, self.funcionario_id, self.tree_funcionarios, self.funcionario_logado_id)),
+            ("Excluir", lambda: DEL_FUNCIONARIO(self.funcionario_id, self.tree_funcionarios, self.funcionario_logado_id))
         ]
         for i, (texto, cmd) in enumerate(botoes):
             btn = ttk.Button(btn_frame, text=texto, command=cmd)
