@@ -74,7 +74,6 @@ CREATE TABLE Injetora (
     tipo_de_controle VARCHAR(50),
     capacidade_de_injecao INT,
     forca_de_fechamento INT,
-    preco_medio_USD DECIMAL(10,2),
     preco_medio_BRL DECIMAL(10,2),
     quantidade INT DEFAULT 0,
     observacao TEXT,
@@ -94,7 +93,6 @@ CREATE TABLE Compra (
     data_entrega_real DATE,
     status_compra VARCHAR(20) NOT NULL DEFAULT 'pendente',
     forma_pagamento VARCHAR(50),
-    valor_total_USD DECIMAL(12,2),
     valor_total_BRL DECIMAL(12,2),
     numero_nota_fiscal VARCHAR(50),
     observacoes TEXT,
@@ -111,7 +109,6 @@ CREATE TABLE ItemCompra (
     ID_Injetora INT,
     quantidade INT NOT NULL,
     preco_unitario_BRL DECIMAL(10,2),
-    preco_unitario_USD DECIMAL(10,2),
     FOREIGN KEY (ID_Compra) REFERENCES Compra(ID_Compra),
     FOREIGN KEY (ID_Injetora) REFERENCES Injetora(ID_Injetora)
 );
@@ -145,7 +142,7 @@ CREATE TABLE EnderecoCliente (
 );
 
 -- ======================
--- TABELA: Venda (ATUALIZADA)
+-- TABELA: Venda
 -- ======================
 CREATE TABLE Venda (
     ID_Venda INT PRIMARY KEY AUTO_INCREMENT,
@@ -154,7 +151,6 @@ CREATE TABLE Venda (
     data_venda DATE NOT NULL,
     forma_pagamento VARCHAR(50),
     valor_total_BRL DECIMAL(12,2),
-    valor_total_USD DECIMAL(12,2),
     observacoes TEXT,
     status_aprovacao VARCHAR(20) DEFAULT 'Em análise', -- 'Aprovado', 'Reprovado', 'Em análise'
     aprovado_por INT, -- ID do gestor que aprovou/reprovou
@@ -174,7 +170,6 @@ CREATE TABLE ItemVenda (
     ID_Injetora INT,
     quantidade INT NOT NULL,
     preco_unitario_BRL DECIMAL(10,2),
-    preco_unitario_USD DECIMAL(10,2),
     FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda),
     FOREIGN KEY (ID_Injetora) REFERENCES Injetora(ID_Injetora)
 );

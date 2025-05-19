@@ -20,7 +20,7 @@ def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
         # Inserir nova injetora
         query = """
         INSERT INTO Injetora (marca, modelo, tipo_de_controle, capacidade_de_injecao, 
-                             forca_de_fechamento, preco_medio_USD, preco_medio_BRL, 
+                             forca_de_fechamento, preco_medio_BRL, 
                              quantidade, observacao, ID_Fornecedor)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
@@ -30,7 +30,6 @@ def ADD_INJETORA(entries, fornecedor_cb, tree_injetoras):
             entries["Tipo de Controle"].get(),
             int(entries["Capacidade de Injeção (g)"].get()),  # Alterado para int
             int(entries["Força de Fechamento (ton)"].get()),  # Alterado para int
-            float(entries["Preço Médio (USD)"].get()),
             float(entries["Preço Médio (BRL)"].get()),
             int(entries["Quantidade"].get()),
             entries["Observações"].get(),
@@ -105,7 +104,6 @@ def UPD_INJETORA(entries, fornecedor_cb, injetora_id, tree):
         tipo_de_controle = %s,
         capacidade_de_injecao = %s,
         forca_de_fechamento = %s,
-        preco_medio_USD = %s,
         preco_medio_BRL = %s,
         quantidade = %s,
         observacao = %s,
@@ -118,7 +116,6 @@ def UPD_INJETORA(entries, fornecedor_cb, injetora_id, tree):
         entries["Tipo de Controle"].get(),
         int(entries["Capacidade de Injeção (g)"].get()),
         int(entries["Força de Fechamento (ton)"].get()),
-        float(entries["Preço Médio (USD)"].get()),
         float(entries["Preço Médio (BRL)"].get()),
         int(entries["Quantidade"].get()),
         entries["Observações"].get(),
@@ -160,7 +157,6 @@ def UPD_TABELA_IJETORA(tree):
             inj["tipo_de_controle"],
             inj["capacidade_de_injecao"],
             inj["forca_de_fechamento"],
-            inj["preco_medio_USD"],
             inj["preco_medio_BRL"],
             inj["quantidade"],
             inj["NM_Fornecedor"],
@@ -200,9 +196,6 @@ def UPD_CAMPOS_INJETORA(entries, fornecedor_cb, injetora_id, id_inj, fornecedore
         
         entries["Força de Fechamento (ton)"].delete(0, "end")
         entries["Força de Fechamento (ton)"].insert(0, str(inj["forca_de_fechamento"]))
-        
-        entries["Preço Médio (USD)"].delete(0, "end")
-        entries["Preço Médio (USD)"].insert(0, str(inj["preco_medio_USD"]))
         
         entries["Preço Médio (BRL)"].delete(0, "end")
         entries["Preço Médio (BRL)"].insert(0, str(inj["preco_medio_BRL"]))

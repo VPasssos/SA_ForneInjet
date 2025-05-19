@@ -39,7 +39,7 @@ class TELA_ADM:
         campos = [
             ("Marca", 0, 0), ("Modelo", 0, 2), 
             ("Tipo de Controle", 1, 0), ("Capacidade de Injeção (g)", 1, 2),
-            ("Força de Fechamento (ton)", 2, 0), ("Preço Médio (USD)", 2, 2),
+            ("Força de Fechamento (ton)", 2, 0),
             ("Preço Médio (BRL)", 3, 0), ("Quantidade", 3, 2),
             ("Observações", 4, 0), ("Fornecedor", 4, 2)
         ]
@@ -85,7 +85,7 @@ class TELA_ADM:
         self.search_entry_injetora.pack(side="left", fill="x", expand=True)
         self.search_entry_injetora.bind("<KeyRelease>", self.filtrar_itens_injetoras)
 
-        cols = ["ID","Marca", "Modelo", "Tipo", "Capacidade", "Força", "Preço USD", "Preço BRL", "Qtd", "Fornecedor","Observações"]
+        cols = ["ID","Marca", "Modelo", "Tipo", "Capacidade", "Força", "Preço BRL", "Qtd", "Fornecedor","Observações"]
         self.tree_injetoras = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
         for col in cols:
@@ -475,7 +475,7 @@ class TELA_ADM:
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
             ("Quantidade", 1, 0), ("Cadastrante", 1, 2),
-            ("Preço Unitário (BRL)", 2, 0), ("Preço Unitário (USA)", 2, 2),
+            ("Preço Unitário (BRL)", 2, 0),
             ("Data Venda", 3, 0), ("Forma Pagamento", 3, 2),
             ("Status Aprovação", 4, 0), ("Observações", 4, 2)
         ]
@@ -535,7 +535,7 @@ class TELA_ADM:
         self.search_entry_venda.bind("<KeyRelease>", self.filtrar_itens_vendas)
 
         # Define the columns for the sales table
-        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
+        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
         self.tree_vendas = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
         for col in cols:

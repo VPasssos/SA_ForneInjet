@@ -35,8 +35,7 @@ class TELA_USER:
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
             ("Quantidade", 1, 0), ("Preço Unitário (BRL)", 1, 2),
-            ("Forma Pagamento", 2, 0), ("Preço Unitário (USA)", 2, 2), 
-            ("Observações", 3, 0)
+            ("Forma Pagamento", 2, 0), ("Observações", 2, 2)
         ]
         
         self.entries_venda = {}
@@ -79,7 +78,7 @@ class TELA_USER:
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
 
-        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
+        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
         self.tree_vendas = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
         for col in cols:

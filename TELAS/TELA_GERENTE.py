@@ -41,7 +41,7 @@ class TELA_GERENTE:
         
         # Colunas da tabela
         cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)",
-                "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento",
+                "Data da Venda", "Forma Pagamento",
                 "Status Aprovação", "Cadastrante", "Observações"]
         
         self.tree_gestao = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
@@ -138,7 +138,6 @@ class TELA_GERENTE:
             ("Data:", detalhes["data_venda"]),
             ("Status:", detalhes["status_aprovacao"]),
             ("Valor Total BRL:", f"R$ {detalhes['valor_total_BRL']:.2f}"),
-            ("Valor Total USD:", f"US$ {detalhes['valor_total_USD']:.2f}"),
             ("Forma Pagamento:", detalhes["forma_pagamento"]),
             ("Observações:", detalhes["observacoes"])
         ]
@@ -150,7 +149,7 @@ class TELA_GERENTE:
         # Adicionar Treeview para itens da venda
         ttk.Label(frame_detalhes, text="Itens da Venda:", font=('Arial', 10, 'bold')).grid(row=len(campos), column=0, columnspan=2, pady=10)
         
-        cols = ["Produto", "Quantidade", "Preço Unitário (BRL)", "Preço Unitário (USD)", "Subtotal (BRL)"]
+        cols = ["Produto", "Quantidade", "Preço Unitário (BRL)", "Subtotal (BRL)"]
         tree_itens = ttk.Treeview(frame_detalhes, columns=cols, show="headings", height=5)
         
         for col in cols:
@@ -171,7 +170,6 @@ class TELA_GERENTE:
                 item["nome_produto"],
                 item["quantidade"],
                 f"R$ {item['preco_unitario_BRL']:.2f}",
-                f"US$ {item['preco_unitario_USD']:.2f}",
                 f"R$ {subtotal:.2f}"
             ))
     def ABA_VENDA(self):
@@ -191,8 +189,7 @@ class TELA_GERENTE:
         campos = [
             ("Cliente", 0, 0), ("Produto", 0, 2),
             ("Quantidade", 1, 0), ("Preço Unitário (BRL)", 1, 2),
-            ("Forma Pagamento", 2, 0), ("Preço Unitário (USA)", 2, 2), 
-            ("Observações", 3, 0)
+            ("Forma Pagamento", 2, 0), ("Observações", 2, 2)
         ]
         
         self.entries_venda = {}
@@ -235,7 +232,7 @@ class TELA_GERENTE:
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
 
-        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Preço Unitário (USA)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
+        cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço Unitário (BRL)", "Data da Venda", "Forma Pagamento", "Status Aprovação", "Cadastrante", "Observações"]
         self.tree_vendas = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
         for col in cols:

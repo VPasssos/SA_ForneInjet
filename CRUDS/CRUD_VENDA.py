@@ -37,22 +37,25 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             messagebox.showwarning("Aviso", "Produto não encontrado!")
             return
 
+        # Calcular valor total
+        quantidade = int(entries["Quantidade"].get())
+        preco_unitario = float(entries["Preço Unitário (BRL)"].get())
+        valor_total = quantidade * preco_unitario
+
         # Inserir nova venda
         query = """
-        INSERT INTO Venda (data_venda, valor_total_BRL, valor_total_USD, 
-                        status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO Venda (data_venda, valor_total_BRL, 
+        status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        conn = get_connection()
-        cursor = conn.cursor()
+        
         cursor.execute("SELECT permissao FROM funcionario WHERE id_funcionario = %s", (funcionario_id,))
-
         permissao = cursor.fetchone()
+        
         if permissao and permissao[0] == "admin":   
             valores = (
                 entries["Data Venda"].get(),
-                float(entries["Preço Unitário (BRL)"].get()),
-                float(entries["Preço Unitário (USA)"].get()),
+                valor_total,
                 entries["Status Aprovação"].get(),
                 id_cliente[0],
                 funcionario_id,
@@ -65,8 +68,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             data_atual = date.today()
             valores = (
                 data_atual,
-                float(entries["Preço Unitário (BRL)"].get()),
-                float(entries["Preço Unitário (USA)"].get()),
+                valor_total,
                 status_aprovacao,
                 id_cliente[0],
                 funcionario_id,
@@ -77,18 +79,16 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
         cursor.execute(query, valores)
         id_venda = cursor.lastrowid
 
-        # Inserir item da venda
+        # Inserir item da venda (CORRIGIDO - removido parâmetro extra)
         query_item = """
-        INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, 
-                            preco_unitario_BRL, preco_unitario_USD)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL)
+        VALUES (%s, %s, %s, %s)
         """
         valores_item = (
             id_venda,
             id_produto[0],
-            int(entries["Quantidade"].get()),
-            float(entries["Preço Unitário (BRL)"].get()),
-            float(entries["Preço Unitário (USA)"].get())
+            quantidade,
+            preco_unitario
         )
 
         cursor.execute(query_item, valores_item)
@@ -103,7 +103,6 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
     finally:
         if cursor: cursor.close()
         if conn: conn.close()
-
 
 def DEL_VENDA(venda_id, tree):
     id_venda = venda_id.get()
@@ -175,7 +174,6 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         UPDATE Venda SET 
             data_venda = %s,
             valor_total_BRL = %s,
-            valor_total_USD = %s,
             status_aprovacao = %s,
             ID_Cliente = %s,
             observacoes = %s,
@@ -185,7 +183,6 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         valores = (
             entries["Data Venda"].get(),
             float(entries["Preço Unitário (BRL)"].get()),
-            float(entries["Preço Unitário (USA)"].get()),
             entries["Status Aprovação"].get(),
             id_cliente,
             entries["Observações"].get(),
@@ -199,15 +196,13 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         UPDATE ItemVenda SET 
             ID_Injetora = %s,
             quantidade = %s,
-            preco_unitario_BRL = %s,
-            preco_unitario_USD = %s
+            preco_unitario_BRL = %s
         WHERE ID_Venda = %s
         """
         valores_item = (
             id_produto,
             int(entries["Quantidade"].get()),
             float(entries["Preço Unitário (BRL)"].get()),
-            float(entries["Preço Unitário (USA)"].get()),
             id_venda
         )
         cursor.execute(query_item, valores_item)
@@ -234,7 +229,7 @@ def UPD_TABELA_VENDAS(tree):
     # Buscar vendas com informações completas
     query = """
     SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
-        iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+        iv.quantidade, iv.preco_unitario_BRL,
         v.data_venda, v.forma_pagamento, v.status_aprovacao, f.nome AS cadastrante, v.observacoes
     FROM Venda v
     JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
@@ -253,7 +248,6 @@ def UPD_TABELA_VENDAS(tree):
             venda["produto"],
             venda["quantidade"],
             venda["preco_unitario_BRL"],
-            venda["preco_unitario_USD"],
             venda["data_venda"],
             venda["forma_pagamento"],
             venda["status_aprovacao"],
@@ -271,7 +265,7 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
     # Buscar dados completos da venda
     query = """
     SELECT v.*, c.nome AS cliente, i.modelo AS produto, 
-           iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+           iv.quantidade, iv.preco_unitario_BRL,
            f.nome AS cadastrante
     FROM Venda v
     JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
@@ -293,9 +287,6 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
 
         entries["Preço Unitário (BRL)"].delete(0, "end")
         entries["Preço Unitário (BRL)"].insert(0, str(venda["preco_unitario_BRL"]))
-
-        entries["Preço Unitário (USA)"].delete(0, "end")
-        entries["Preço Unitário (USA)"].insert(0, str(venda["preco_unitario_USD"]))
 
         entries["Quantidade"].delete(0, "end")
         entries["Quantidade"].insert(0, str(venda["quantidade"]))
@@ -331,7 +322,7 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     table_frame.pack(fill="both", expand=True, padx=10, pady=10)
     
     # Criar Treeview
-    cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço BRL", "Preço USD", 
+    cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço BRL",
             "Data", "Status", "Forma Pagamento", "Observações"]
     
     tree = ttk.Treeview(table_frame, columns=cols, show="headings", height=20)
@@ -353,7 +344,7 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     
     query = """
     SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
-           iv.quantidade, iv.preco_unitario_BRL, iv.preco_unitario_USD,
+           iv.quantidade, iv.preco_unitario_BRL,
            v.data_venda, v.status_aprovacao, v.forma_pagamento, v.observacoes
     FROM Venda v
     JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
@@ -373,7 +364,6 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
             venda["produto"],
             venda["quantidade"],
             venda["preco_unitario_BRL"],
-            venda["preco_unitario_USD"],
             venda["data_venda"],
             venda["status_aprovacao"],
             venda["forma_pagamento"],
@@ -468,7 +458,6 @@ def GET_DETALHES_VENDA(venda_id):
         v.data_venda,
         v.status_aprovacao,
         v.valor_total_BRL,
-        v.valor_total_USD,
         v.forma_pagamento,
         v.observacoes,
         ap.nome AS nome_aprovador,
@@ -495,7 +484,6 @@ def GET_DETALHES_VENDA(venda_id):
         i.modelo,
         iv.quantidade,
         iv.preco_unitario_BRL,
-        iv.preco_unitario_USD,
         (iv.quantidade * iv.preco_unitario_BRL) AS subtotal_BRL
     FROM ItemVenda iv
     JOIN Injetora i ON iv.ID_Injetora = i.ID_Injetora
@@ -527,7 +515,6 @@ def GET_DETALHES_VENDA(venda_id):
         'data_venda': venda['data_venda'].strftime('%d/%m/%Y') if venda['data_venda'] else '',
         'status_aprovacao': venda['status_aprovacao'],
         'valor_total_BRL': float(venda['valor_total_BRL']) if venda['valor_total_BRL'] else 0.0,
-        'valor_total_USD': float(venda['valor_total_USD']) if venda['valor_total_USD'] else 0.0,
         'forma_pagamento': venda['forma_pagamento'],
         'observacoes': venda['observacoes'],
         'aprovado_por': venda['nome_aprovador'],
@@ -542,7 +529,6 @@ def GET_DETALHES_VENDA(venda_id):
             'nome_produto': f"{item['marca']} {item['modelo']}",
             'quantidade': item['quantidade'],
             'preco_unitario_BRL': float(item['preco_unitario_BRL']),
-            'preco_unitario_USD': float(item['preco_unitario_USD']),
             'subtotal_BRL': float(item['subtotal_BRL'])
         })
 
