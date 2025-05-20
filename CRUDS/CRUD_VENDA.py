@@ -473,20 +473,6 @@ def GET_DETALHES_VENDA(venda_id):
     cursor.execute(query_itens, (venda_id,))
     itens = cursor.fetchall()
 
-    # Consulta do histórico de status
-    query_historico = """
-    SELECT 
-        status_novo,
-        data_alteracao,
-        f.nome AS alterado_por
-    FROM HistoricoStatusVenda h
-    JOIN Funcionario f ON h.alterado_por = f.ID_Funcionario
-    WHERE h.ID_Venda = %s
-    ORDER BY data_alteracao DESC
-    """
-    cursor.execute(query_historico, (venda_id,))
-    historico = cursor.fetchall()
-
     # Formatando os dados para retorno
     detalhes = {
         'id_venda': venda['ID_Venda'],
@@ -500,7 +486,6 @@ def GET_DETALHES_VENDA(venda_id):
         'aprovado_por': venda['nome_aprovador'],
         'data_aprovacao': venda['data_aprovacao'].strftime('%d/%m/%Y %H:%M') if venda.get('data_aprovacao') else '',
         'itens': [],
-        'historico': []
     }
 
     for item in itens:
@@ -511,12 +496,6 @@ def GET_DETALHES_VENDA(venda_id):
             'subtotal_BRL': float(item['subtotal_BRL'])
         })
 
-    for registro in historico:
-        detalhes['historico'].append({
-            'status': registro['status_novo'],
-            'data': registro['data_alteracao'].strftime('%d/%m/%Y %H:%M'),
-            'alterado_por': registro['alterado_por']
-        })
 
     cursor.close()
     conn.close()

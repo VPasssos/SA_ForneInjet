@@ -82,25 +82,6 @@ CREATE TABLE Injetora (
 );
 
 -- ======================
--- TABELA: Compra
--- ======================
-CREATE TABLE Compra (
-    ID_Compra INT PRIMARY KEY AUTO_INCREMENT,
-    ID_Fornecedor INT NOT NULL,
-    ID_Funcionario INT NOT NULL,
-    data_compra DATE NOT NULL,
-    data_entrega_prevista DATE,
-    data_entrega_real DATE,
-    status_compra VARCHAR(20) NOT NULL DEFAULT 'pendente',
-    forma_pagamento VARCHAR(50),
-    valor_total_BRL DECIMAL(12,2),
-    numero_nota_fiscal VARCHAR(50),
-    observacoes TEXT,
-    FOREIGN KEY (ID_Fornecedor) REFERENCES Fornecedor(ID_Fornecedor),
-    FOREIGN KEY (ID_Funcionario) REFERENCES Funcionario(ID_Funcionario)
-);
-
--- ======================
 -- TABELA: Cliente
 -- ======================
 CREATE TABLE Cliente (

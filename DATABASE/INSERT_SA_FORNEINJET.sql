@@ -43,12 +43,6 @@ INSERT INTO EnderecoCliente (ID_Cliente, rua, numero, bairro, cidade, estado, ce
 (3, 'Rua dos Moldes', '300', 'Polo Tecnológico', 'São Paulo', 'SP', '05301-000'),
 (4, 'Alameda das Embalagens', '400', 'Industrial', 'Rio de Janeiro', 'RJ', '20001-000'),
 (5, 'Rua Tecnológica', '500', 'Distrito Industrial', 'São Paulo', 'SP', '06301-000');
-INSERT INTO Compra (ID_Fornecedor, ID_Funcionario, data_compra, data_entrega_prevista, data_entrega_real, status_compra, forma_pagamento, valor_total_BRL, numero_nota_fiscal, observacoes) VALUES
-(1, 3, '2023-01-15', '2023-02-20', '2023-02-18', 'concluido', 'Boleto 30 dias', 360000.00, 'NF123456', 'Compra de 2 máquinas Arburg Allrounder 470'),
-(2, 3, '2023-02-10', '2023-03-15', '2023-03-12', 'concluido', 'Cartão de Crédito', 350000.00, 'NF234567', 'Compra de 2 máquinas Engel Victory'),
-(3, 3, '2023-03-05', '2023-04-10', NULL, 'processamento', 'Transferência Bancária', 280000.00, NULL, 'Máquina Husky em processo de importação'),
-(4, 3, '2023-04-20', '2023-05-25', '2023-05-22', 'concluido', 'Financiamento', 540000.00, 'NF345678', 'Compra de 4 máquinas Milacron Elektron'),
-(5, 3, '2023-05-12', '2023-06-17', NULL, 'pendente', 'Boleto 60 dias', 420000.00, NULL, 'Aguardando aprovação financeira');
 INSERT INTO Venda (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, observacoes, status_aprovacao, aprovado_por, data_aprovacao) VALUES
 (1, 2, '2023-02-01', 'Financiamento', 900000.00, 'Venda de máquina Arburg Allrounder 470', 'Em análise', 1, '2023-02-01 10:30:00', 'Cliente com bom histórico de pagamentos'),
 (2, 2, '2023-03-15', 'Boleto 30 dias', 875000.00, 'Venda de máquina Engel Victory', 'Em análise', 1, '2023-03-15 14:15:00', 'Pagamento à vista com desconto'),
