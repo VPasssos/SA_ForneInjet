@@ -49,13 +49,7 @@ INSERT INTO Compra (ID_Fornecedor, ID_Funcionario, data_compra, data_entrega_pre
 (3, 3, '2023-03-05', '2023-04-10', NULL, 'processamento', 'Transferência Bancária', 280000.00, NULL, 'Máquina Husky em processo de importação'),
 (4, 3, '2023-04-20', '2023-05-25', '2023-05-22', 'concluido', 'Financiamento', 540000.00, 'NF345678', 'Compra de 4 máquinas Milacron Elektron'),
 (5, 3, '2023-05-12', '2023-06-17', NULL, 'pendente', 'Boleto 60 dias', 420000.00, NULL, 'Aguardando aprovação financeira');
-INSERT INTO ItemCompra (ID_Compra, ID_Injetora, quantidade, preco_unitario_BRL) VALUES
-(1, 1, 2, 900000.00),
-(2, 2, 2, 875000.00),
-(3, 3, 1, 1400000.00),
-(4, 4, 4, 675000.00),
-(5, 5, 2, 1050000.00);
-INSERT INTO Venda (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, observacoes, status_aprovacao, aprovado_por, data_aprovacao, justificativa_status) VALUES
+INSERT INTO Venda (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, observacoes, status_aprovacao, aprovado_por, data_aprovacao) VALUES
 (1, 2, '2023-02-01', 'Financiamento', 900000.00, 'Venda de máquina Arburg Allrounder 470', 'Em análise', 1, '2023-02-01 10:30:00', 'Cliente com bom histórico de pagamentos'),
 (2, 2, '2023-03-15', 'Boleto 30 dias', 875000.00, 'Venda de máquina Engel Victory', 'Em análise', 1, '2023-03-15 14:15:00', 'Pagamento à vista com desconto'),
 (3, 2, '2023-04-10', 'Cartão de Crédito', 1400000.00, 'Venda de máquina Husky HyPET', 'Em análise', NULL, NULL, NULL),
@@ -67,8 +61,3 @@ INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL) VA
 (3, 3, 1, 1400000.00),
 (4, 4, 1, 675000.00),
 (5, 5, 1, 1050000.00);
-INSERT INTO HistoricoStatusVenda (ID_Venda, status_anterior, status_novo, data_alteracao, alterado_por, justificativa) VALUES
-(1, 'Em análise', 'Aprovado', '2023-02-01 10:30:00', 1, 'Análise financeira positiva'),
-(2, 'Em análise', 'Aprovado', '2023-03-15 14:15:00', 1, 'Pagamento confirmado'),
-(4, 'Em análise', 'Reprovado', '2023-05-20 16:45:00', 1, 'Cliente com pendências financeiras'),
-(5, 'Em análise', 'Aprovado', '2023-06-05 11:20:00', 1, 'Garantia adicional aceita');

@@ -379,7 +379,7 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     
     ttk.Button(btn_frame, text="Fechar", command=solicitacao_window.destroy).pack(side="right")
 
-def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor, justificativa=None):
+def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor):
     """
     Atualiza o status de aprovação de uma venda no banco de dados
 
@@ -387,7 +387,6 @@ def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor, justificativa=None):
         venda_id (int): ID da venda a ser atualizada
         novo_status (str): Novo status ('Aprovado', 'Reprovado', 'Em análise')
         id_gestor (int): ID do funcionário que está realizando a aprovação
-        justificativa (str, optional): Justificativa para mudança de status
 
     Returns:
         bool: True se a atualização foi bem-sucedida, False caso contrário
@@ -407,28 +406,11 @@ def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor, justificativa=None):
     UPDATE Venda 
     SET status_aprovacao = %s, 
         aprovado_por = %s, 
-        data_aprovacao = %s,
-        justificativa_status = %s
+        data_aprovacao = %s
     WHERE ID_Venda = %s
     """
     data_aprovacao = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    cursor.execute(query, (novo_status, id_gestor, data_aprovacao, justificativa, venda_id))
-
-    # Registrar no histórico
-    query_historico = """
-    INSERT INTO HistoricoStatusVenda 
-    (ID_Venda, status_anterior, status_novo, data_alteracao, alterado_por, justificativa)
-    SELECT 
-        %s, 
-        status_aprovacao, 
-        %s, 
-        %s, 
-        %s, 
-        %s
-    FROM Venda 
-    WHERE ID_Venda = %s
-    """
-    cursor.execute(query_historico, (venda_id, novo_status, data_aprovacao, id_gestor, justificativa, venda_id))
+    cursor.execute(query, (novo_status, id_gestor, data_aprovacao, venda_id))
 
     conn.commit()
     cursor.close()
@@ -461,8 +443,7 @@ def GET_DETALHES_VENDA(venda_id):
         v.forma_pagamento,
         v.observacoes,
         ap.nome AS nome_aprovador,
-        v.data_aprovacao,
-        v.justificativa_status
+        v.data_aprovacao
     FROM Venda v
     JOIN Cliente c ON v.ID_Cliente = c.ID_Cliente
     JOIN Funcionario f ON v.ID_Funcionario = f.ID_Funcionario
@@ -497,8 +478,7 @@ def GET_DETALHES_VENDA(venda_id):
     SELECT 
         status_novo,
         data_alteracao,
-        f.nome AS alterado_por,
-        justificativa
+        f.nome AS alterado_por
     FROM HistoricoStatusVenda h
     JOIN Funcionario f ON h.alterado_por = f.ID_Funcionario
     WHERE h.ID_Venda = %s
@@ -519,7 +499,6 @@ def GET_DETALHES_VENDA(venda_id):
         'observacoes': venda['observacoes'],
         'aprovado_por': venda['nome_aprovador'],
         'data_aprovacao': venda['data_aprovacao'].strftime('%d/%m/%Y %H:%M') if venda.get('data_aprovacao') else '',
-        'justificativa': venda.get('justificativa_status', ''),
         'itens': [],
         'historico': []
     }
@@ -536,8 +515,7 @@ def GET_DETALHES_VENDA(venda_id):
         detalhes['historico'].append({
             'status': registro['status_novo'],
             'data': registro['data_alteracao'].strftime('%d/%m/%Y %H:%M'),
-            'alterado_por': registro['alterado_por'],
-            'justificativa': registro.get('justificativa', '')
+            'alterado_por': registro['alterado_por']
         })
 
     cursor.close()

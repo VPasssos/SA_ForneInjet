@@ -101,19 +101,6 @@ CREATE TABLE Compra (
 );
 
 -- ======================
--- TABELA: ItemCompra
--- ======================
-CREATE TABLE ItemCompra (
-    ID_ItemCompra INT PRIMARY KEY AUTO_INCREMENT,
-    ID_Compra INT,
-    ID_Injetora INT,
-    quantidade INT NOT NULL,
-    preco_unitario_BRL DECIMAL(10,2),
-    FOREIGN KEY (ID_Compra) REFERENCES Compra(ID_Compra),
-    FOREIGN KEY (ID_Injetora) REFERENCES Injetora(ID_Injetora)
-);
-
--- ======================
 -- TABELA: Cliente
 -- ======================
 CREATE TABLE Cliente (
@@ -155,7 +142,6 @@ CREATE TABLE Venda (
     status_aprovacao VARCHAR(20) DEFAULT 'Em análise', -- 'Aprovado', 'Reprovado', 'Em análise'
     aprovado_por INT, -- ID do gestor que aprovou/reprovou
     data_aprovacao DATETIME, -- Data e hora da aprovação/reprovação
-    justificativa_status TEXT, -- Justificativa para reprovação
     FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente),
     FOREIGN KEY (ID_Funcionario) REFERENCES Funcionario(ID_Funcionario),
     FOREIGN KEY (aprovado_por) REFERENCES Funcionario(ID_Funcionario)
@@ -174,20 +160,6 @@ CREATE TABLE ItemVenda (
     FOREIGN KEY (ID_Injetora) REFERENCES Injetora(ID_Injetora)
 );
 
--- ======================
--- TABELA: Histórico de Status de Venda (OPCIONAL)
--- ======================
-CREATE TABLE HistoricoStatusVenda (
-    ID_Historico INT PRIMARY KEY AUTO_INCREMENT,
-    ID_Venda INT NOT NULL,
-    status_anterior VARCHAR(20),
-    status_novo VARCHAR(20) NOT NULL,
-    data_alteracao DATETIME NOT NULL,
-    alterado_por INT NOT NULL,
-    justificativa TEXT,
-    FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda),
-    FOREIGN KEY (alterado_por) REFERENCES Funcionario(ID_Funcionario)
-);
 
 -- ======================
 -- ÍNDICES PARA MELHOR PERFORMANCE
