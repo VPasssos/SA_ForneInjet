@@ -44,11 +44,11 @@ INSERT INTO EnderecoCliente (ID_Cliente, rua, numero, bairro, cidade, estado, ce
 (4, 'Alameda das Embalagens', '400', 'Industrial', 'Rio de Janeiro', 'RJ', '20001-000'),
 (5, 'Rua Tecnológica', '500', 'Distrito Industrial', 'São Paulo', 'SP', '06301-000');
 INSERT INTO Venda (ID_Cliente, ID_Funcionario, data_venda, forma_pagamento, valor_total_BRL, observacoes, status_aprovacao, aprovado_por, data_aprovacao) VALUES
-(1, 2, '2023-02-01', 'Financiamento', 900000.00, 'Venda de máquina Arburg Allrounder 470', 'Em análise', 1, '2023-02-01 10:30:00', 'Cliente com bom histórico de pagamentos'),
-(2, 2, '2023-03-15', 'Boleto 30 dias', 875000.00, 'Venda de máquina Engel Victory', 'Em análise', 1, '2023-03-15 14:15:00', 'Pagamento à vista com desconto'),
-(3, 2, '2023-04-10', 'Cartão de Crédito', 1400000.00, 'Venda de máquina Husky HyPET', 'Em análise', NULL, NULL, NULL),
-(4, 2, '2023-05-20', 'Transferência Bancária', 675000.00, 'Venda de máquina Milacron Elektron', 'Em análise', 1, '2023-05-20 16:45:00', 'Cliente com restrição cadastral'),
-(5, 2, '2023-06-05', 'Boleto 60 dias', 1050000.00, 'Venda de máquina Wittmann EcoPower', 'Em análise', 1, '2023-06-05 11:20:00', 'Cliente com garantia adicional');
+(1, 2, '2023-02-01', 'Financiamento', 900000.00, 'Venda de máquina Arburg Allrounder 470', 'Em análise', 1, '2023-02-01 10:30:00'),
+(2, 2, '2023-03-15', 'Boleto 30 dias', 875000.00, 'Venda de máquina Engel Victory', 'Em análise', 1, '2023-03-15 14:15:00'),
+(3, 2, '2023-04-10', 'Cartão de Crédito', 1400000.00, 'Venda de máquina Husky HyPET', 'Em análise', NULL, NULL),
+(4, 2, '2023-05-20', 'Transferência Bancária', 675000.00, 'Venda de máquina Milacron Elektron', 'Em análise', 1, '2023-05-20 16:45:00'),
+(5, 2, '2023-06-05', 'Boleto 60 dias', 1050000.00, 'Venda de máquina Wittmann EcoPower', 'Em análise', 1, '2023-06-05 11:20:00');
 INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL) VALUES
 (1, 1, 1, 900000.00),
 (2, 2, 1, 875000.00),

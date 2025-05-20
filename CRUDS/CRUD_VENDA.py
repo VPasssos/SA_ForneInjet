@@ -5,11 +5,21 @@ import tkinter as tk
 from datetime import datetime
 
 def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
+    """
+    Cadastra uma nova venda no sistema com validações e tratamento de dados.
+    
+    Args:
+        entries (dict): Campos do formulário de venda
+        cliente_cb (Combobox): Combobox com seleção de clientes
+        produto_cb_venda (Combobox): Combobox com seleção de produtos
+        tree (Treeview): Componente de tabela para exibição
+        funcionario_id (int/str): ID do funcionário responsável pela venda
+    """
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Obter o ID do funcionário (tratando se for Entry widget)
+        # Validação do ID do funcionário (pode ser Entry ou variável)
         if hasattr(funcionario_id, 'get'):
             funcionario_id = funcionario_id.get()
         if not funcionario_id:
@@ -21,7 +31,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             messagebox.showwarning("Aviso", "ID do funcionário inválido!")
             return
 
-        # Obter ID do cliente
+        # Obter ID do cliente selecionado
         nome_cliente = cliente_cb.get()
         cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
         id_cliente = cursor.fetchone()
@@ -29,7 +39,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             messagebox.showwarning("Aviso", "Cliente não encontrado!")
             return
 
-        # Obter ID do produto
+        # Obter ID do produto selecionado
         nome_produto = produto_cb_venda.get()
         cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
         id_produto = cursor.fetchone()
@@ -37,22 +47,24 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             messagebox.showwarning("Aviso", "Produto não encontrado!")
             return
 
-        # Calcular valor total
+        # Cálculo do valor total da venda
         quantidade = int(entries["Quantidade"].get())
         preco_unitario = float(entries["Preço Unitário (BRL)"].get())
         valor_total = quantidade * preco_unitario
 
-        # Inserir nova venda
+        # Query para inserir a venda principal
         query = """
         INSERT INTO Venda (data_venda, valor_total_BRL, 
         status_aprovacao, ID_Cliente, ID_Funcionario, observacoes, forma_pagamento)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         
+        # Verifica permissões do funcionário para definir status
         cursor.execute("SELECT permissao FROM funcionario WHERE id_funcionario = %s", (funcionario_id,))
         permissao = cursor.fetchone()
         
         if permissao and permissao[0] == "admin":   
+            # Administradores podem definir status diretamente
             valores = (
                 entries["Data Venda"].get(),
                 valor_total,
@@ -63,6 +75,7 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
                 entries["Forma Pagamento"].get()
             )
         else:
+            # Outros funcionários cadastram como "Em análise"
             status_aprovacao = "Em análise"
             from datetime import date
             data_atual = date.today()
@@ -77,9 +90,9 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
             )
 
         cursor.execute(query, valores)
-        id_venda = cursor.lastrowid
+        id_venda = cursor.lastrowid  # Obtém o ID da venda recém-criada
 
-        # Inserir item da venda (CORRIGIDO - removido parâmetro extra)
+        # Query para inserir o item da venda
         query_item = """
         INSERT INTO ItemVenda (ID_Venda, ID_Injetora, quantidade, preco_unitario_BRL)
         VALUES (%s, %s, %s, %s)
@@ -95,8 +108,8 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
         conn.commit()
 
         messagebox.showinfo("Sucesso", "Venda cadastrada com sucesso!")
-        UPD_TABELA_VENDAS(tree)
-        LIMPAR_CAMPOS(entries)
+        UPD_TABELA_VENDAS(tree)  # Atualiza a tabela de exibição
+        LIMPAR_CAMPOS(entries)   # Limpa os campos do formulário
 
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao cadastrar a venda:\n{str(e)}")
@@ -105,34 +118,53 @@ def ADD_VENDA(entries, cliente_cb, produto_cb_venda, tree, funcionario_id):
         if conn: conn.close()
 
 def DEL_VENDA(venda_id, tree):
+    """
+    Remove uma venda do sistema após confirmação.
+    
+    Args:
+        venda_id (StringVar/IntVar): ID da venda a ser removida
+        tree (Treeview): Componente de tabela para atualização
+    """
     id_venda = venda_id.get()
     if not id_venda:
         messagebox.showwarning("Aviso", "Selecione uma venda para excluir!")
         return
 
+    # Confirmação de exclusão
     resposta = messagebox.askyesno("Confirmar", "Deseja realmente excluir esta venda?")
     if resposta:
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Primeiro excluir os itens da venda
+        # Primeiro exclui os itens associados (integridade referencial)
         cursor.execute("DELETE FROM ItemVenda WHERE ID_Venda = %s", (id_venda,))
-        # Depois excluir a venda
+        # Depois exclui a venda principal
         cursor.execute("DELETE FROM Venda WHERE ID_Venda = %s", (id_venda,))
         conn.commit()
 
         messagebox.showinfo("Sucesso", "Venda excluída com sucesso!")
-        UPD_TABELA_VENDAS(tree)
+        UPD_TABELA_VENDAS(tree)  # Atualiza a tabela
         cursor.close()
         conn.close()
 
 def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
+    """
+    Atualiza os dados de uma venda existente.
+    
+    Args:
+        entries (dict): Campos do formulário com os novos valores
+        cliente_cb (Combobox): Combobox de seleção de cliente
+        venda_id (StringVar/IntVar): ID da venda sendo editada
+        tree (Treeview): Tabela para atualização visual
+        funcionario_logado_id (int/str): ID do funcionário realizando a edição
+    """
     try:
         id_venda = venda_id.get()
         if not id_venda:
             messagebox.showwarning("Aviso", "Selecione uma venda para atualizar!")
             return
 
+        # Validação do ID do funcionário
         if hasattr(funcionario_logado_id, 'get'):
             funcionario_logado_id = funcionario_logado_id.get()
         if not funcionario_logado_id:
@@ -147,7 +179,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Obter ID do cliente
+        # Validação do cliente
         nome_cliente = cliente_cb.get()
         cursor.execute("SELECT ID_Cliente FROM Cliente WHERE nome = %s", (nome_cliente,))
         resultado_cliente = cursor.fetchone()
@@ -156,7 +188,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
             return
         id_cliente = resultado_cliente[0]
 
-        # Obter ID do produto
+        # Validação do produto
         nome_produto = entries["Produto"].get()
         cursor.execute("SELECT ID_Injetora FROM Injetora WHERE modelo = %s", (nome_produto,))
         resultado_produto = cursor.fetchone()
@@ -165,11 +197,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
             return
         id_produto = resultado_produto[0]
 
-        # Limpar resultados pendentes do SELECT de funcionário, caso necessário
-        cursor.execute("SELECT nome FROM Funcionario WHERE ID_Funcionario = %s", (funcionario_logado_id,))
-        _ = cursor.fetchone()
-
-        # Atualizar tabela Venda
+        # Query de atualização da venda principal
         query = """
         UPDATE Venda SET 
             data_venda = %s,
@@ -191,7 +219,7 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         )
         cursor.execute(query, valores)
 
-        # Atualizar tabela ItemVenda
+        # Query de atualização do item da venda
         query_item = """
         UPDATE ItemVenda SET 
             ID_Injetora = %s,
@@ -219,14 +247,20 @@ def UPD_VENDA(entries, cliente_cb, venda_id, tree, funcionario_logado_id):
         if conn: conn.close()
 
 def UPD_TABELA_VENDAS(tree):
+    """
+    Atualiza a tabela de exibição com todas as vendas cadastradas.
+    
+    Args:
+        tree (Treeview): Componente de tabela a ser atualizado
+    """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Limpar a treeview
+    # Limpa a tabela atual
     for item in tree.get_children():
         tree.delete(item)
 
-    # Buscar vendas com informações completas
+    # Query que combina dados de múltiplas tabelas (JOIN)
     query = """
     SELECT v.ID_Venda, c.nome AS cliente, i.modelo AS produto, 
         iv.quantidade, iv.preco_unitario_BRL,
@@ -240,7 +274,7 @@ def UPD_TABELA_VENDAS(tree):
     cursor.execute(query)
     vendas = cursor.fetchall()
 
-    # Preencher a treeview
+    # Preenche a tabela com os dados formatados
     for venda in vendas:
         tree.insert("", "end", values=(
             venda["ID_Venda"],
@@ -259,10 +293,19 @@ def UPD_TABELA_VENDAS(tree):
     conn.close()
 
 def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
+    """
+    Preenche os campos do formulário com os dados de uma venda selecionada.
+    
+    Args:
+        entries (dict): Campos do formulário a serem preenchidos
+        cliente_cb (Combobox): Combobox de seleção de cliente
+        venda_id (StringVar/IntVar): Variável para armazenar o ID da venda
+        id_venda (int): ID da venda a ser carregada
+    """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Buscar dados completos da venda
+    # Query que busca todos os dados da venda e relacionamentos
     query = """
     SELECT v.*, c.nome AS cliente, i.modelo AS produto, 
            iv.quantidade, iv.preco_unitario_BRL,
@@ -278,7 +321,7 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
     venda = cursor.fetchone()
 
     if venda:
-        # Preencher os campos
+        # Preenche cada campo do formulário
         entries["Data Venda"].delete(0, "end")
         entries["Data Venda"].insert(0, venda["data_venda"])
 
@@ -300,19 +343,27 @@ def UPD_CAMPOS_VENDA(entries, cliente_cb, venda_id, id_venda):
         entries["Observações"].delete(0, "end")
         entries["Observações"].insert(0, venda["observacoes"])
 
-        # Configurar os comboboxes
+        # Configura os comboboxes
         cliente_cb.set(venda["cliente"])
         entries["Produto"].delete(0, "end")
         entries["Produto"].insert(0, venda["produto"])
 
-        # Atualizar o ID da venda
+        # Atualiza o ID da venda no formulário
         venda_id.delete(0, "end")
         venda_id.insert(0, str(venda["ID_Venda"]))
 
     cursor.close()
     conn.close()
+
 def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
-    # Criar nova janela
+    """
+    Exibe uma janela com todas as solicitações de venda de um funcionário.
+    
+    Args:
+        funcionario_id (int): ID do funcionário para filtrar as vendas
+        parent_window (Tk): Janela pai para ancorar a nova janela
+    """
+    # Configuração da janela
     solicitacao_window = tk.Toplevel(parent_window)
     solicitacao_window.title("Minhas Solicitações de Venda")
     solicitacao_window.geometry("1200x600")
@@ -321,24 +372,24 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     table_frame = ttk.Frame(solicitacao_window)
     table_frame.pack(fill="both", expand=True, padx=10, pady=10)
     
-    # Criar Treeview
+    # Configuração da Treeview
     cols = ["ID", "Cliente", "Produto", "Quantidade", "Preço BRL",
             "Data", "Status", "Forma Pagamento", "Observações"]
     
     tree = ttk.Treeview(table_frame, columns=cols, show="headings", height=20)
     
-    # Configurar colunas
+    # Configura as colunas
     for col in cols:
         tree.heading(col, text=col)
         tree.column(col, width=100, anchor='center')
     
-    # Adicionar scrollbar
+    # Adiciona scrollbar
     scroll = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
     scroll.pack(side="right", fill="y")
     tree.configure(yscrollcommand=scroll.set)
     tree.pack(fill="both", expand=True)
     
-    # Preencher a tabela com as vendas do funcionário
+    # Busca as vendas do funcionário
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -357,6 +408,7 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
     cursor.execute(query, (funcionario_id,))
     vendas = cursor.fetchall()
     
+    # Preenche a tabela com os resultados
     for venda in vendas:
         tree.insert("", "end", values=(
             venda["ID_Venda"],
@@ -381,27 +433,27 @@ def CONSULTAR_SOLICITACAO(funcionario_id, parent_window):
 
 def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor):
     """
-    Atualiza o status de aprovação de uma venda no banco de dados
-
+    Atualiza o status de aprovação de uma venda.
+    
     Args:
         venda_id (int): ID da venda a ser atualizada
         novo_status (str): Novo status ('Aprovado', 'Reprovado', 'Em análise')
-        id_gestor (int): ID do funcionário que está realizando a aprovação
-
+        id_gestor (int): ID do funcionário que está aprovando
+        
     Returns:
         bool: True se a atualização foi bem-sucedida, False caso contrário
     """
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Verificar se a venda existe
+    # Verifica se a venda existe
     cursor.execute("SELECT ID_Venda FROM Venda WHERE ID_Venda = %s", (venda_id,))
     if not cursor.fetchone():
         cursor.close()
         conn.close()
         return False
 
-    # Atualizar o status da venda
+    # Atualiza o status com data e responsável
     query = """
     UPDATE Venda 
     SET status_aprovacao = %s, 
@@ -419,19 +471,18 @@ def UPDATE_STATUS_VENDA(venda_id, novo_status, id_gestor):
 
 def GET_DETALHES_VENDA(venda_id):
     """
-    Obtém todos os detalhes de uma venda específica, incluindo itens vendidos
-
+    Obtém todos os detalhes de uma venda específica.
+    
     Args:
         venda_id (int): ID da venda a ser consultada
-
+        
     Returns:
-        dict: Dicionário com todos os detalhes da venda e seus itens
-              Retorna None se a venda não for encontrada
+        dict: Dicionário com todos os detalhes da venda ou None se não encontrada
     """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Consulta principal da venda
+    # Consulta os dados principais da venda
     query_venda = """
     SELECT 
         v.ID_Venda,
@@ -458,7 +509,7 @@ def GET_DETALHES_VENDA(venda_id):
         conn.close()
         return None
 
-    # Consulta dos itens da venda
+    # Consulta os itens da venda
     query_itens = """
     SELECT 
         i.marca, 
@@ -473,7 +524,7 @@ def GET_DETALHES_VENDA(venda_id):
     cursor.execute(query_itens, (venda_id,))
     itens = cursor.fetchall()
 
-    # Formatando os dados para retorno
+    # Formata os dados para retorno
     detalhes = {
         'id_venda': venda['ID_Venda'],
         'nome_cliente': venda['nome_cliente'],
@@ -488,6 +539,7 @@ def GET_DETALHES_VENDA(venda_id):
         'itens': [],
     }
 
+    # Adiciona os itens ao resultado
     for item in itens:
         detalhes['itens'].append({
             'nome_produto': f"{item['marca']} {item['modelo']}",
@@ -496,11 +548,16 @@ def GET_DETALHES_VENDA(venda_id):
             'subtotal_BRL': float(item['subtotal_BRL'])
         })
 
-
     cursor.close()
     conn.close()
     return detalhes
 
 def LIMPAR_CAMPOS(entries):
+    """
+    Limpa todos os campos de entrada do formulário.
+    
+    Args:
+        entries (dict): Dicionário com referências aos campos de entrada
+    """
     for entry in entries.values():
         entry.delete(0, "end")

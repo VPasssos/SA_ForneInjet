@@ -4,38 +4,47 @@ from CRUDS.CRUD_FORNECEDOR import *
 from CRUDS.CRUD_FUNCIONARIO import *
 from CRUDS.CRUD_CLIENTE import *
 from CRUDS.CRUD_VENDA import *
-class TELA_ADM:
-    def __init__(self, root, id_funcionario):
-        self.root = root
-        self.root.title("Sistema ForneInjet - Gestão Completa - ADM")
-        self.root.geometry("1200x800")
-        self.funcionario_logado_id = id_funcionario
-        self.fornecedores_disponiveis = {}
-        self.funcionario_dados = UPD_DADOS_FUNCIONARIOS(self.funcionario_logado_id)
-        self.CRIAR_WIDGETS()
 
+class TELA_ADM:
+    # Inicializador da classe, onde são definidos os parâmetros iniciais
+    def __init__(self, root, id_funcionario):
+        self.root = root  # A janela principal (root)
+        self.root.title("Sistema ForneInjet - Gestão Completa - ADM")  # Título da janela
+        self.root.geometry("1200x800")  # Dimensões da janela
+        self.funcionario_logado_id = id_funcionario  # ID do funcionário logado
+        self.fornecedores_disponiveis = {}  # Dicionário para armazenar fornecedores
+        self.funcionario_dados = UPD_DADOS_FUNCIONARIOS(self.funcionario_logado_id)  # Pega os dados do funcionário logado
+        self.CRIAR_WIDGETS()  # Cria todos os widgets da interface
+
+    # Função responsável por criar os widgets (componentes gráficos) da interface
     def CRIAR_WIDGETS(self):
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(fill="both", expand=True)
+        self.notebook = ttk.Notebook(self.root)  # Cria o widget Notebook para abas
+        self.notebook.pack(fill="both", expand=True)  # Coloca o notebook na janela principal, ocupando todo o espaço disponível
         
+        # Criação de abas para diferentes funcionalidades do sistema
         self.ABA_VENDA()
         self.ABA_CLIENTE()
         self.ABA_INJETORAS()
         self.ABA_FORNECEDORES()
         self.ABA_FUNCIONARIOS()
         self.ABA_CONFIGURACAO()
-        
+
+    # Função que cria a aba "INJETORAS"
     def ABA_INJETORAS(self):
+        # Cria o frame para a aba Injetoras
         frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="INJETORA")
-        form_frame = ttk.LabelFrame(frame, text="Dados da Injetora", padding=10)
-        form_frame.pack(fill="x", padx=10, pady=5)
-
-        from CRUDS.CRUD_FORNECEDOR import GET_FORNECEDOR  
-        fornecedores = GET_FORNECEDOR()
+        self.notebook.add(frame, text="INJETORA")  # Adiciona a aba ao notebook com o nome "INJETORA"
         
-        nomes_fornecedores = [fornecedor[1] for fornecedor in fornecedores]
+        # Criação do formulário de entrada de dados da injetora
+        form_frame = ttk.LabelFrame(frame, text="Dados da Injetora", padding=10)
+        form_frame.pack(fill="x", padx=10, pady=5)  # Formulário com padding (espaçamento)
 
+        # Importa a função GET_FORNECEDOR para pegar os fornecedores disponíveis
+        from CRUDS.CRUD_FORNECEDOR import GET_FORNECEDOR  
+        fornecedores = GET_FORNECEDOR()  # Chama a função que retorna a lista de fornecedores
+        nomes_fornecedores = [fornecedor[1] for fornecedor in fornecedores]  # Extrai os nomes dos fornecedores
+        
+        # Define os campos do formulário e suas posições na grade (linha, coluna)
         campos = [
             ("Marca", 0, 0), ("Modelo", 0, 2), 
             ("Tipo de Controle", 1, 0), ("Capacidade de Injeção (g)", 1, 2),
@@ -43,102 +52,136 @@ class TELA_ADM:
             ("Preço Médio (BRL)", 3, 0), ("Quantidade", 3, 2),
             ("Observações", 4, 0), ("Fornecedor", 4, 2)
         ]
+        
+        # Dicionário para armazenar os campos de entrada (Entry ou Combobox)
         self.entries_injetora = {}
+        
+        # Criação dos widgets para cada campo do formulário
         for campo, row, col in campos:
-            lbl = ttk.Label(form_frame, text=f"{campo}:")
-            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
+            lbl = ttk.Label(form_frame, text=f"{campo}:")  # Cria o rótulo (label) para cada campo
+            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")  # Coloca o label na grade
             
-            if campo == "Fornecedor":
-                entry = ttk.Combobox(form_frame, width=30, values=nomes_fornecedores)
-                self.fornecedor_cb_injetora = entry
+            if campo == "Fornecedor":  # Se o campo for "Fornecedor", usamos um Combobox
+                entry = ttk.Combobox(form_frame, width=30, values=nomes_fornecedores)  # Combobox com os fornecedores
+                self.fornecedor_cb_injetora = entry  # Atribui o combobox à variável
             else:
-                entry = ttk.Entry(form_frame, width=30)
+                entry = ttk.Entry(form_frame, width=30)  # Se não, é um campo de texto (Entry)
             
-            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
-            self.entries_injetora[campo] = entry
+            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")  # Coloca o campo na grade
+            self.entries_injetora[campo] = entry  # Armazena o campo no dicionário
+
+        # Campo invisível que será usado para armazenar o ID da injetora
         self.injetora_id = ttk.Entry(form_frame)
         self.injetora_id.grid(row=0, column=4)
-        self.injetora_id.grid_remove()
-
+        self.injetora_id.grid_remove()  # Remove esse campo da tela, ele é invisível
+        
+        # Criação do frame para os botões (Novo, Salvar, Excluir)
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill="x", padx=10, pady=5)
 
+        # Definição das funções dos botões
         botoes = [
             ("Novo", lambda: ADD_INJETORA(self.entries_injetora, self.fornecedor_cb_injetora , self.tree_injetoras)),
             ("Salvar", lambda: UPD_INJETORA(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id, self.tree_injetoras)),
             ("Excluir", lambda: DEL_INJETORA(self.injetora_id, self.tree_injetoras))
         ]
+        
+        # Criação dos botões e ligação das funções a eles
         for i, (texto, cmd) in enumerate(botoes):
-            btn = ttk.Button(btn_frame, text=texto, command=cmd)
-            btn.grid(row=0, column=i, padx=5)
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)  # Cria o botão
+            btn.grid(row=0, column=i, padx=5)  # Coloca o botão no frame
 
+        # Criação do frame para a tabela de injetoras
         table_frame = ttk.Frame(frame)
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
+        # Criação do campo de busca
         search_frame = ttk.Frame(table_frame)
         search_frame.pack(fill="x", pady=(0, 10))
 
-        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")  # Rótulo para a pesquisa
         lbl_search.pack(side="left", padx=(0, 5))
 
+        # Campo de texto para digitar o termo de pesquisa
         self.search_entry_injetora = ttk.Entry(search_frame, width=30)
         self.search_entry_injetora.pack(side="left", fill="x", expand=True)
-        self.search_entry_injetora.bind("<KeyRelease>", self.filtrar_itens_injetoras)
+        self.search_entry_injetora.bind("<KeyRelease>", self.filtrar_itens_injetoras)  # Evento de tecla pressionada para buscar
 
+        # Definição das colunas da tabela de injetoras
         cols = ["ID","Marca", "Modelo", "Tipo", "Capacidade", "Força", "Preço BRL", "Qtd", "Fornecedor","Observações"]
+        
+        # Criação da árvore (Treeview) para exibir as injetoras
         self.tree_injetoras = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
+        # Definindo a largura e o alinhamento das colunas
         for col in cols:
-            width = 100  # Largura padrão
+            width = 100  # Largura padrão das colunas
             if col == "ID":
-                width = 50  # Largura menor para ID
+                width = 50  # Coluna ID com largura menor
             elif col in ["Observações", "Endereço"]:
-                width = 150  # Largura maior para campos longos
+                width = 150  # Colunas com textos longos
             elif col == "Fornecedor":
-                width = 120  # Largura intermediária para fornecedor
-                
-            self.tree_injetoras.heading(col, text=col)
-            self.tree_injetoras.column(col, width=width, anchor='w' if col in ["Observações", "Endereço"] else 'center')
-        
+                width = 120  # Coluna de fornecedor com largura intermediária
+
+            self.tree_injetoras.heading(col, text=col)  # Definindo o cabeçalho das colunas
+            self.tree_injetoras.column(col, width=width, anchor='w' if col in ["Observações", "Endereço"] else 'center')  # Alinhamento das colunas
+
+        # Criação da barra de rolagem vertical para a tabela
         scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_injetoras.yview)
         scroll.pack(side="right", fill="y")
-        self.tree_injetoras.configure(yscrollcommand=scroll.set)
-        
+        self.tree_injetoras.configure(yscrollcommand=scroll.set)  # Conecta a barra de rolagem à árvore
+
+        # Exibe a árvore (tabela) de injetoras
         self.tree_injetoras.pack(fill="both", expand=True)
+        
+        # Atualiza a tabela com os dados das injetoras
         UPD_TABELA_IJETORA(self.tree_injetoras)
+
+        # Configura a seleção de uma injetora na tabela
         self.tree_injetoras.bind("<ButtonRelease-1>", self.SELECIONAR_INJETORA)
 
-    def filtrar_itens_injetoras(self, event=None):
-        termo = self.search_entry_injetora.get().lower()
 
+    def filtrar_itens_injetoras(self, event=None):
+        termo = self.search_entry_injetora.get().lower()  # Pega o termo de busca digitado na caixa de texto e converte para minúsculo
+
+        # Se o termo estiver vazio, atualiza a tabela sem filtros
         if termo == "":
-            UPD_TABELA_IJETORA(self.tree_injetoras)
+            UPD_TABELA_IJETORA(self.tree_injetoras)  # Chama a função para atualizar a tabela com todas as injetoras
         else: 
+            # Se o termo não estiver vazio, realiza a filtragem
             if not termo:
-                for child in self.tree_injetoras.get_children(""):
-                    self.tree_injetoras.reattach(child, "", "end")
+                for child in self.tree_injetoras.get_children(""):  # Percorre todos os filhos (linhas) na árvore
+                    self.tree_injetoras.reattach(child, "", "end")  # Reanexa os itens na árvore (não filtra se o termo for vazio)
                 return
             
-            for child in self.tree_injetoras.get_children(""):
-                valores = self.tree_injetoras.item(child)["values"]
-                texto = " ".join(str(v) for v in valores).lower()
-                if termo in texto:
-                    self.tree_injetoras.reattach(child, "", "end")
+            # Filtra as injetoras com base no termo de pesquisa
+            for child in self.tree_injetoras.get_children(""):  # Percorre todos os itens da tabela
+                valores = self.tree_injetoras.item(child)["values"]  # Obtém os valores (dados) do item
+                texto = " ".join(str(v) for v in valores).lower()  # Junta os valores em uma string e converte para minúsculo
+                if termo in texto:  # Se o termo de busca estiver no texto da injetora
+                    self.tree_injetoras.reattach(child, "", "end")  # Mantém o item na tabela
                 else:
-                    self.tree_injetoras.detach(child)
+                    self.tree_injetoras.detach(child)  # Remove o item da tabela
+
 
     def SELECIONAR_INJETORA(self, event):
-        item = self.tree_injetoras.selection()
-        if item:
-            id_inj = self.tree_injetoras.item(item[0])["values"][0]
+        item = self.tree_injetoras.selection()  # Obtém o item selecionado na tabela
+        if item:  # Se houver um item selecionado
+            id_inj = self.tree_injetoras.item(item[0])["values"][0]  # Pega o ID da injetora selecionada
             UPD_CAMPOS_INJETORA(self.entries_injetora, self.fornecedor_cb_injetora, self.injetora_id, id_inj, self.fornecedores_disponiveis)
+            # Atualiza os campos de dados da injetora com base no ID selecionado
+
         
     def ABA_FORNECEDORES(self):
-        frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text="FORNECEDORES")
-        form_frame = ttk.LabelFrame(frame, text="Dados da fornecedor", padding=10)
+        # Criação da aba de fornecedores
+        frame = ttk.Frame(self.notebook)  # Cria o frame para a aba
+        self.notebook.add(frame, text="FORNECEDORES")  # Adiciona a aba com o nome "FORNECEDORES"
+        
+        # Criação do formulário de entrada de dados do fornecedor
+        form_frame = ttk.LabelFrame(frame, text="Dados da fornecedor", padding=10)  # LabelFrame para o formulário
         form_frame.pack(fill="x", padx=10, pady=5)
 
+        # Definição dos campos do formulário
         campos = [
             ("Nome", 0, 0), ("CNPJ", 0, 2),
             ("Telefone", 1, 0), ("E-mail", 1, 2),
@@ -148,69 +191,89 @@ class TELA_ADM:
             ("CEP", 5, 0)
         ]
         
-        self.entries_fornecedor = {}
+        self.entries_fornecedor = {}  # Dicionário para armazenar os campos de entrada
         for campo, row, col in campos:
-            lbl = ttk.Label(form_frame, text=f"{campo}:")
-            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")
+            lbl = ttk.Label(form_frame, text=f"{campo}:")  # Criação do rótulo para o campo
+            lbl.grid(row=row, column=col, padx=5, pady=5, sticky="e")  # Colocação do rótulo na grade
             
+            # Condicional para verificar se o campo é "Fornecedor", então cria um combobox
             if campo == "Fornecedor":
-                entry = ttk.Combobox(form_frame, width=30)
-                self.fornecedor_cb_fornecedor = entry
+                entry = ttk.Combobox(form_frame, width=30)  # Combobox para fornecedor
+                self.fornecedor_cb_fornecedor = entry  # Atribui ao combobox para usar mais tarde
             else:
-                entry = ttk.Entry(form_frame, width=30)
+                entry = ttk.Entry(form_frame, width=30)  # Criação de um campo de entrada (Entry) para os demais campos
             
-            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")
-            self.entries_fornecedor[campo] = entry
+            entry.grid(row=row, column=col+1, padx=5, pady=5, sticky="w")  # Coloca o campo na grade
+            self.entries_fornecedor[campo] = entry  # Armazena o campo no dicionário
+
+        # Campo invisível para armazenar o ID do fornecedor
         self.fornecedor_id = ttk.Entry(form_frame)
         self.fornecedor_id.grid(row=0, column=4)
-        self.fornecedor_id.grid_remove()
+        self.fornecedor_id.grid_remove()  # Remove o campo da tela (não será exibido)
 
+        # Criação do frame para os botões
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill="x", padx=10, pady=5)
 
+        # Definição das ações dos botões
         botoes = [
             ("Novo", lambda: ADD_FORNECEDOR(self.entries_fornecedor, self.tree_fornecedor, self.funcionario_logado_id)),
             ("Salvar", lambda: UPD_FORNECEDOR(self.entries_fornecedor, self.fornecedor_id, self.tree_fornecedor, self.funcionario_logado_id)),
             ("Excluir", lambda: DEL_FORNECEDOR(self.fornecedor_id, self.tree_fornecedor))
         ]
+        
+        # Criação dos botões e suas ações associadas
         for i, (texto, cmd) in enumerate(botoes):
-            btn = ttk.Button(btn_frame, text=texto, command=cmd)
-            btn.grid(row=0, column=i, padx=5)
+            btn = ttk.Button(btn_frame, text=texto, command=cmd)  # Cria o botão
+            btn.grid(row=0, column=i, padx=5)  # Coloca o botão na grade
 
+        # Criação do frame para a tabela de fornecedores
         table_frame = ttk.Frame(frame)
         table_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
+        # Criação do campo de pesquisa para a tabela de fornecedores
         search_frame = ttk.Frame(table_frame)
         search_frame.pack(fill="x", pady=(0, 10))
 
-        lbl_search = ttk.Label(search_frame, text="Pesquisar:")
+        lbl_search = ttk.Label(search_frame, text="Pesquisar:")  # Rótulo da pesquisa
         lbl_search.pack(side="left", padx=(0, 5))
 
+        # Caixa de texto para inserir o termo de busca
         self.search_entry_fornecedor = ttk.Entry(search_frame, width=30)
         self.search_entry_fornecedor.pack(side="left", fill="x", expand=True)
-        self.search_entry_fornecedor.bind("<KeyRelease>", self.filtrar_itens_fornecedor)
+        self.search_entry_fornecedor.bind("<KeyRelease>", self.filtrar_itens_fornecedor)  # Associa evento de pesquisa
 
+        # Definição das colunas da tabela de fornecedores
         cols = ["ID","Nome", "CNPJ", "Telefone", "E-mail", "Website", "Endereço"]
+        
+        # Criação da tabela (Treeview) para exibir os fornecedores
         self.tree_fornecedor = ttk.Treeview(table_frame, columns=cols, show="headings", height=15)
 
+        # Definindo a largura e o alinhamento das colunas
         for col in cols:
-            width = 100  # Largura padrão
+            width = 100  # Largura padrão das colunas
             if col == "ID":
-                width = 50
+                width = 50  # Coluna ID com largura menor
             elif col == "Endereço":
                 width = 180  # Largura maior para endereço completo
             elif col == "CNPJ":
                 width = 120  # Largura maior para CNPJ
-                
-            self.tree_fornecedor.heading(col, text=col)
-            self.tree_fornecedor.column(col, width=width, anchor='w' if col == "Endereço" else 'center')
-        
+
+            self.tree_fornecedor.heading(col, text=col)  # Define o cabeçalho das colunas
+            self.tree_fornecedor.column(col, width=width, anchor='w' if col == "Endereço" else 'center')  # Alinhamento das colunas
+
+        # Criação da barra de rolagem vertical para a tabela
         scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree_fornecedor.yview)
         scroll.pack(side="right", fill="y")
-        self.tree_fornecedor.configure(yscrollcommand=scroll.set)
+        self.tree_fornecedor.configure(yscrollcommand=scroll.set)  # Conecta a barra de rolagem à tabela
         
+        # Exibe a tabela de fornecedores
         self.tree_fornecedor.pack(fill="both", expand=True)
+        
+        # Atualiza a tabela com os dados dos fornecedores
         UPD_TABELA_FORNECEDOR(self.tree_fornecedor)
+
+        # Define a ação quando um fornecedor é selecionado na tabela
         self.tree_fornecedor.bind("<ButtonRelease-1>", self.SELECIONAR_FORNECEDOR)
 
     def filtrar_itens_fornecedor(self, event=None):
