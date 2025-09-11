@@ -1,0 +1,234 @@
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text-color);
+  font-family: var(--font-family);
+}
+
+main {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: var(--comeia);
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* ===================== */
+/* Seção de operações */
+/* ===================== */
+.ops_cli {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  gap: 20px;
+}
+
+.ops_cli button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.ops_cli button:hover {
+  background-color: var(--hover-color);
+}
+
+.ops_cli form {
+  display: flex;
+  gap: 10px;
+}
+
+.ops_cli input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 250px;
+  background-color: var(--input-bg);
+}
+
+.ops_cli input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(224, 165, 0, 0.2);
+}
+
+/* ===================== */
+/* Tabela de dados */
+/* ===================== */
+.tabela_cli, .table {
+  margin-top: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.table a {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-right: 15px;
+  transition: color 0.3s;
+}
+
+.table a:hover {
+  color: var(--hover-color);
+  text-decoration: underline;
+}
+
+.table a.excluir {
+  color: #e74c3c;
+}
+
+.table a.excluir:hover {
+  color: #c0392b;
+}
+
+/* ===================== */
+/* Modal centralizado e responsivo */
+/* ===================== */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #00000050;
+  padding: 20px;
+  z-index: 999;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+}
+
+.modal input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.modal button {
+  margin-top: 10px;
+}
+
+/* ===================== */
+/* Estilo geral de tabela */
+/* ===================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+/* ===================== */
+/* Mensagens de feedback */
+/* ===================== */
+.mensagem {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.sucesso {
+  background: #d4edda;
+  color: #155724;
+}
+
+.erro {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ===================== */
+/* Form Row (grid) */
+/* ===================== */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* ===================== */
+/* Responsividade */
+/* ===================== */
+@media (max-width: 768px) {
+  .ops_cli {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ops_cli form {
+    width: 100%;
+  }
+
+  .ops_cli input {
+    width: 100%;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

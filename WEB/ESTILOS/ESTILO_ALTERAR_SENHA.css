@@ -1,0 +1,168 @@
+/* ESTILO_LOGIN.css */
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+.main_login {
+    width: 100vw;
+    min-height: 100vh;
+    background: var(--background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.card_login {
+    width: min(90%, 500px);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem;
+    background: white;
+    border: 1px solid var(--vidro);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.card_login > h1 {
+    color: var(--primaria-amarelo);
+    font-weight: 800;
+    margin: 0 0 1.5rem 0;
+    font-size: 2.2rem;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.card_login > p {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.textfield {
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.textfield > label {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 600;
+}
+
+.textfield > input {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 1rem;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    box-shadow: 0 3px 15px var(--shadow-color);
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.textfield > input:focus {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    transform: scale(1.01);
+    border-color: var(--primary-color);
+}
+
+.textfield > input::placeholder {
+    color: var(--placeholder-color);
+    opacity: 0.8;
+}
+
+.checkbox_area {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.checkbox_area input {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.btn_login {
+    width: 100%;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: white;
+    background: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.btn_login:hover {
+    background: var(--hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(224, 165, 0, 0.3);
+}
+
+.btn_login:active {
+    transform: translateY(0);   
+}
+
+.erro {
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: #fde8e8;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 950px) {
+    .card_login {
+        width: 85%;
+    }
+}
+
+@media (max-width: 768px) {
+    .main_login {
+        flex-direction: column;
+    }
+
+    .card_login {
+        margin-bottom: 2rem;
+        padding: 2rem;
+    }
+    
+    .card_login > h1 {
+        font-size: 1.8rem;
+    }
+}

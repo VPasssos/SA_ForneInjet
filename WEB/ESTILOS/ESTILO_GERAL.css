@@ -1,0 +1,19 @@
+:root {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    --primaria-amarelo: #e0a500;
+    --secundaria-amarelo: #e0a500;
+    --comeia: #8b5e3c;
+    --cinza-claro: #f6f6f3;
+    --cinza-escuro: #374151; 
+    --vidro: rgba(0, 0, 0, 0.06);
+
+    --primary-color: var(--primaria-amarelo);
+    --hover-color: var(--secundaria-amarelo);
+    --text-color: var(--cinza-escuro);
+    --input-bg: white;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --placeholder-color: #c4a484;
+    --background: var(--cinza-claro)
+}
+
