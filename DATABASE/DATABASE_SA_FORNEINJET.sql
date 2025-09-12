@@ -1,8 +1,8 @@
 -- ======================
 -- CRIAÇÃO DO BANCO
 -- ======================
-CREATE DATABASE IF NOT EXISTS forneinjet;
-USE forneinjet;
+CREATE DATABASE IF NOT EXISTS SA_FORNEINJET;
+USE SA_FORNEINJET;
 
 -- ======================
 -- TABELA: Funcionário

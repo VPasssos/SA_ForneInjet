@@ -1,0 +1,4 @@
+body {font-family: Arial; background:#fff; margin:20px; color:#333;}
+h1,h2,h3{color:#444;} table{border-collapse:collapse;width:100%;margin-top:10px;}
+table,th,td{border:1px solid #ccc;padding:8px;} form input,form button{margin:5px;padding:8px;}
+button{background:#007BFF;color:white;border:none;cursor:pointer;}button:hover{background:#0056b3;}

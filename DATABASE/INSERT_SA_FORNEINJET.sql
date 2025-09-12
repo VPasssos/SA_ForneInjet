@@ -1,4 +1,4 @@
-USE forneinjet;
+USE SA_FORNEINJET;
 INSERT INTO Funcionario (nome, cargo, telefone, email, usuario, senha, permissao, situacao, data_admissao) VALUES
 ('Ana Carolina Mendes', 'Gerente Comercial', '(11) 98765-4321', 'ana.mendes@forneinjet.com', 'ana.mendes', "ana.123321", 'admin', 'ativo', '2018-05-10'),
 ('Carlos Eduardo Lima', 'Vendedor Sênior', '(11) 98765-1234', 'carlos.lima@forneinjet.com', 'carlos.lima', 'carlos.321123', 'usuario' , 'ativo', '2019-03-15'),
