@@ -11,7 +11,7 @@ def test_forneinjet():
     
     try:
         # Testar página inicial
-        driver.get("http://localhost/SA_ForneInjet/WEB/")
+        driver.get("http://localhost:8080/SA_ForneInjet/WEB/")
         print("Página inicial carregada")
         
         # Testar navegação
@@ -28,9 +28,13 @@ def test_forneinjet():
                 print(f"Erro ao acessar {link_text}: {e}")
         
         # Testar adição de funcionário
-        driver.get("http://localhost/SA_ForneInjet/WEB/funcionarios.php")
+        driver.get("http://localhost:8080/SA_ForneInjet/WEB/funcionarios.php")
         driver.find_element(By.NAME, "nome").send_keys("Teste Selenium")
         driver.find_element(By.NAME, "cargo").send_keys("Testador")
+        driver.find_element(By.NAME, "telefone").send_keys("(11) 99999-9999")
+        driver.find_element(By.NAME, "email").send_keys("teste@selenium.com")
+        driver.find_element(By.NAME, "usuario").send_keys("teste.selenium")
+        driver.find_element(By.NAME, "senha").send_keys("senha123")
         driver.find_element(By.NAME, "add").click()
         print("Funcionário adicionado")
         

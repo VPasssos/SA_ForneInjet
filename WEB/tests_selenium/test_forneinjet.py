@@ -14,14 +14,13 @@ class TestForneInjet:
         """Configuração inicial antes de todos os testes"""
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.implicitly_wait(10)
-        cls.base_url = "http://localhost/SA_ForneInjet/WEB/"  # Altere para a URL do seu servidor
+        cls.base_url = "http://localhost:8080/SA_ForneInjet/WEB/"  # Altere para a URL do seu servidor
         cls.wait = WebDriverWait(cls.driver, 10)
     
     @classmethod
     def teardown_class(cls):
         """Limpeza após todos os testes"""
         cls.driver.quit()
-    
     
     def test_01_acessar_pagina_inicial(self):
         """Testa acesso à página inicial"""
@@ -43,7 +42,7 @@ class TestForneInjet:
     
     def test_03_adicionar_novo_funcionario(self):
         """Testa adição de novo funcionário"""
-        self.driver.get(f"{self.base_url}/funcionarios.php")
+        self.driver.get(f"{self.base_url}funcionarios.php")
         
         # Preencher formulário
         self.driver.find_element(By.NAME, "nome").send_keys("João Silva Teste")
@@ -62,7 +61,7 @@ class TestForneInjet:
     
     def test_04_adicionar_novo_cliente(self):
         """Testa adição de novo cliente"""
-        self.driver.get(f"{self.base_url}/clientes.php")
+        self.driver.get(f"{self.base_url}clientes.php")
         
         # Preencher formulário
         self.driver.find_element(By.NAME, "nome").send_keys("Empresa Teste Ltda")
@@ -79,7 +78,7 @@ class TestForneInjet:
     
     def test_05_adicionar_nova_injetora(self):
         """Testa adição de nova injetora"""
-        self.driver.get(f"{self.base_url}/injetoras.php")
+        self.driver.get(f"{self.base_url}injetoras.php")
         
         # Preencher formulário
         self.driver.find_element(By.NAME, "marca").send_keys("Marca Teste")
@@ -99,7 +98,7 @@ class TestForneInjet:
     
     def test_06_testar_exclusao_item(self):
         """Testa exclusão de um item (funcionário)"""
-        self.driver.get(f"{self.base_url}/funcionarios.php")
+        self.driver.get(f"{self.base_url}funcionarios.php")
         
         # Encontrar todos os links de exclusão
         delete_links = self.driver.find_elements(By.LINK_TEXT, "Excluir")
@@ -124,17 +123,18 @@ class TestForneInjet:
             ("Clientes", "clientes.php", "Gerenciar Clientes"),
             ("Fornecedores", "fornecedores.php", "Gerenciar Fornecedores"),
             ("Injetoras", "injetoras.php", "Gerenciar Injetoras"),
+            ("Funcionários", "funcionarios.php", "Gerenciar Funcionários"),
             ("Vendas", "vendas.php", "Gerenciar Vendas")
         ]
         
         for page_name, page_url, expected_text in pages:
-            self.driver.get(f"{self.base_url}/{page_url}")
+            self.driver.get(f"{self.base_url}{page_url}")
             assert expected_text in self.driver.page_source
             print(f"Página {page_name} carregada com sucesso")
     
     def test_08_testar_formularios_vazios(self):
         """Testa envio de formulários vazios"""
-        self.driver.get(f"{self.base_url}/funcionarios.php")
+        self.driver.get(f"{self.base_url}funcionarios.php")
         
         # Tentar enviar formulário vazio
         self.driver.find_element(By.NAME, "add").click()
